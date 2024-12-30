@@ -13,7 +13,7 @@ databaseChangeLog:
       file: entities/lookups/task_status_ddl_20241230.yaml
       relativeToChangelogFile: true
 
-  # Lookup Seed Data
+  # Seed Data
   - include:
       file: seed-data/setup.yaml
       relativeToChangelogFile: true
