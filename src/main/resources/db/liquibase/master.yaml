@@ -1,0 +1,48 @@
+databaseChangeLog:
+  # Lookups Setup
+  - include:
+      file: entities/lookups/issue_criticality_ddl_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/lookups/issue_status_ddl_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/lookups/task_priority_ddl_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/lookups/task_status_ddl_20241230.yaml
+      relativeToChangelogFile: true
+
+  # Lookup Seed Data
+  - include:
+      file: seed-data/setup.yaml
+      relativeToChangelogFile: true
+
+  # Tables Setup
+  - include:
+      file: entities/issue/issue_ddl_20241230.yamll
+      relativeToChangelogFile: true
+  - include:
+      file: entities/task/task_ddl_20241230.yaml
+      relativeToChangelogFile: true
+
+  # Constraints Setup
+  - include:
+      file: entities/issue/issue_issue_criticality_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/issue/issue_issue_status_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/issue/issue_task_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/task/task_task_priority_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: entities/task/task_task_status_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+
+  # Changelog
+
+  # Test Fixture

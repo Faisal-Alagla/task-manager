@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: issue_criticality_ddl_20241230
+      author: Faisal
+      changes:
+        - createTable:
+            tableName: issue_criticality_lk
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: issue_criticality_lk_pkey
+              - column:
+                  name: name
+                  type: VARCHAR

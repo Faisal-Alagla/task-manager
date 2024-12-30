@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: task-manager
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://db:5432/task-manager}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  liquibase:
+    change-log: classpath:/db/liquibase/master.yaml

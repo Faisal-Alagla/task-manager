@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: task_ddl_20241230
+      author: Faisal
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: task_pkey
+              - column:
+                  defaultValueComputed: now()
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: created_by
+                  type: UUID
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: updated_by
+                  type: UUID
+              - column:
+                  name: name
+                  type: VARCHAR
+              - column:
+                  name: assignee_id
+                  type: UUID
+              - column:
+                  name: due_date
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: status_id
+                  type: INT
+              - column:
+                  name: priority_id
+                  type: INT
+              - column:
+                  defaultValue: 'TRUE'
+                  name: is_active
+                  type: BOOLEAN

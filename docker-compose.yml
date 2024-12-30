@@ -1,0 +1,26 @@
+version: '3'
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: task-manager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - task-manager-network
+  task-manager:
+    build: .
+    image: faisalagla/task-manager
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/task-manager
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - task-manager-network
+networks:
+  task-manager-network:
+    driver: "bridge"

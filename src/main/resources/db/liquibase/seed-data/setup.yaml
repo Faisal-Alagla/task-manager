@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/seed-data/load_issue_criticality_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: liquibase/seed-data/load_issue_status_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: liquibase/seed-data/load_task_priority_20241230.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: liquibase/seed-data/load_task_status_20241230.yaml
+      relativeToChangelogFile: true

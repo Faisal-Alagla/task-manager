@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: 20240524-setup
+      author: Faisal
+      changes:
+        - createTable:
+            tableName: issue
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: issue_pkey
+              - column:
+                  defaultValueComputed: now()
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: created_by
+                  type: UUID
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  name: updated_by
+                  type: UUID
+              - column:
+                  name: name
+                  type: VARCHAR
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: task_id
+                  type: UUID
+              - column:
+                  name: status_id
+                  type: INT
+              - column:
+                  name: criticality_id
+                  type: INT
+              - column:
+                  defaultValue: 'TRUE'
+                  name: is_active
+                  type: BOOLEAN

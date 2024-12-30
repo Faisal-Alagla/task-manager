@@ -1,0 +1,13 @@
+  - changeSet:
+      id: load_issue_criticality_20241230
+      author: Faisal
+      changes:
+        - loadData:
+            tableName: issue_criticality_lk
+            columns:
+              - column:
+                  name: id
+              - column:
+                  name: name
+            file: classpath:db/liquibase/seed-data/data/issue_criticality.csv
+            encoding: UTF-8

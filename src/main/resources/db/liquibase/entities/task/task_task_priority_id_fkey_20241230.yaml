@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: task_task_priority_id_fkey_20241230
+      author: Faisal
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: priority_id
+            baseTableName: task
+            constraintName: task_task_priority_id_fkey
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: task_priority_lk

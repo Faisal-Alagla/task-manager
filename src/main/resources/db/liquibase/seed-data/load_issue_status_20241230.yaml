@@ -1,0 +1,13 @@
+  - changeSet:
+      id: load_issue_status_20241230
+      author: Faisal
+      changes:
+        - loadData:
+            tableName: issue_status_lk
+            columns:
+              - column:
+                  name: id
+              - column:
+                  name: name
+            file: classpath:db/liquibase/seed-data/data/issue_status.csv
+            encoding: UTF-8

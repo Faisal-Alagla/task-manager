@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: issue_issue_status_id_fkey_20241230
+      author: Faisal
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: status_id
+            baseTableName: issue
+            constraintName: issue_issue_status_id_fkey
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: issue_status_lk

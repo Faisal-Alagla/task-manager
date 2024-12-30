@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: issue_status_ddl_20241230
+      author: Faisal
+      changes:
+        - createTable:
+            tableName: issue_status_lk
+            columns:
+              - column:
+                  name: id
+                  type: INT
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: issue_status_lk_pkey
+              - column:
+                  name: name
+                  type: VARCHAR

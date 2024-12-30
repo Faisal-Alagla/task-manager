@@ -1,0 +1,13 @@
+  - changeSet:
+      id: load_task_priority_20241230
+      author: Faisal
+      changes:
+        - loadData:
+            tableName: task_priority_lk
+            columns:
+              - column:
+                  name: id
+              - column:
+                  name: name
+            file: classpath:db/liquibase/seed-data/data/task_priority.csv
+            encoding: UTF-8

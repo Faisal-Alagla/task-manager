@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: issue_issue_criticality_id_fkey_20241230
+      author: Faisal
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: criticality_id
+            baseTableName: issue
+            constraintName: issue_issue_criticality_id_fkey
+            onDelete: NO ACTION
+            referencedColumnNames: id
+            referencedTableName: issue_criticality_lk
