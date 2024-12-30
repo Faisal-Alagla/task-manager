@@ -13,11 +13,6 @@ databaseChangeLog:
       file: entities/lookups/task_status_ddl_20241230.yaml
       relativeToChangelogFile: true
 
-  # Lookup Seed Data
-  - include:
-      file: seed-data/setup.yaml
-      relativeToChangelogFile: true
-
   # Tables Setup
   - include:
       file: entities/issue/issue_ddl_20241230.yamll
@@ -41,6 +36,11 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: entities/task/task_task_status_id_fkey_20241230.yaml
+      relativeToChangelogFile: true
+
+  # Seed Data
+  - include:
+      file: seed-data/setup.yaml
       relativeToChangelogFile: true
 
   # Changelog
