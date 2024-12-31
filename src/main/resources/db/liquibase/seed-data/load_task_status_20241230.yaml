@@ -1,3 +1,4 @@
+databaseChangeLog:
   - changeSet:
       id: load_task_status_20241230
       author: Faisal

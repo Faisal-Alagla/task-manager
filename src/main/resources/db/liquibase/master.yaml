@@ -15,7 +15,7 @@ databaseChangeLog:
 
   # Tables Setup
   - include:
-      file: entities/issue/issue_ddl_20241230.yamll
+      file: entities/issue/issue_ddl_20241230.yaml
       relativeToChangelogFile: true
   - include:
       file: entities/task/task_ddl_20241230.yaml

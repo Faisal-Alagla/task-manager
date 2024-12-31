@@ -1,3 +1,4 @@
+databaseChangeLog:
   - changeSet:
       id: load_issue_status_20241230
       author: Faisal
