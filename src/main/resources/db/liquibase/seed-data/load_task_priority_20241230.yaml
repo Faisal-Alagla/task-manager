@@ -1,3 +1,4 @@
+databaseChangeLog:
   - changeSet:
       id: load_task_priority_20241230
       author: Faisal
