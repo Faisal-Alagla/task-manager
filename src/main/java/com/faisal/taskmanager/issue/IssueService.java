@@ -1,6 +1,5 @@
 package com.faisal.taskmanager.issue;
 
-import com.faisal.taskmanager.task.Task;
 import com.faisal.taskmanager.task.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ public class IssueService implements IIssueService {
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
-        Task task = taskRepository.findById(issueCreationDto.getTaskId())
+        taskRepository.findById(issueCreationDto.getTaskId())
                 .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
 
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
@@ -34,7 +33,7 @@ public class IssueService implements IIssueService {
 
     @Override
     public void deleteIssue(UUID issueId) {
-        Issue issue = issueRepository.findById(issueId)
+        issueRepository.findById(issueId)
                 .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
 
         issueRepository.deleteById(issueId);

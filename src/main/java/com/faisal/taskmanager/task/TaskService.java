@@ -1,7 +1,5 @@
 package com.faisal.taskmanager.task;
 
-import com.faisal.taskmanager.issue.Issue;
-import com.faisal.taskmanager.issue.IssueRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +12,6 @@ import java.util.UUID;
 public class TaskService implements ITaskService {
 
     private final TaskRepository taskRepository;
-    private final IssueRepository issueRepository;
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
@@ -25,17 +22,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto getTask(UUID taskId) {
-        Task task = taskRepository.findById(taskId)
+        return taskRepository.findTaskByIdWithIssueIds(taskId)
                 .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
-
-        TaskResponseDto taskResponseDto = TaskMapper.mapToTaskResponseDto(task);
-        taskResponseDto.setIssuesIds(
-                issueRepository.findAllByTaskId(
-                        taskId
-                ).stream().map(Issue::getId).toList()
-        );
-
-        return taskResponseDto;
     }
 
     @Override
@@ -56,7 +44,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTask(UUID taskId) {
-        Task task = taskRepository.findById(taskId)
+        taskRepository.findById(taskId)
                 .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
 
         taskRepository.deleteById(taskId);
