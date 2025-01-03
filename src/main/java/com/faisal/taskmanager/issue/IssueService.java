@@ -1,7 +1,7 @@
 package com.faisal.taskmanager.issue;
 
-import com.faisal.taskmanager.task.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -11,16 +11,16 @@ import java.util.UUID;
 public class IssueService implements IIssueService {
 
     private final IssueRepository issueRepository;
-    private final TaskRepository taskRepository;
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
-        taskRepository.findById(issueCreationDto.getTaskId())
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
-
-        Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
-
-        return IssueMapper.mapToIssueResponseDto(createdIssue);
+        try {
+            Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
+            return IssueMapper.mapToIssueResponseDto(createdIssue);
+        } catch (DataIntegrityViolationException ex) {
+            //TODO: to be changed with custom exception
+            throw ex;
+        }
     }
 
     @Override
