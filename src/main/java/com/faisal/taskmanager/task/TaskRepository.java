@@ -10,23 +10,24 @@ import java.util.UUID;
 public interface TaskRepository extends JpaRepository<Task, UUID> {
 
     @Query(
-            """
-               SELECT new com.faisal.taskmanager.task.TaskResponseDto(
-                   t.id,
-                   t.name,
-                   t.assigneeId,
-                   t.dueDate,
-                   t.description,
-                   t.statusId,
-                   t.priorityId,
-                   ARRAY_AGG(i.id),
-                   t.isActive
-               )
-               FROM Task t
-               LEFT JOIN Issue i ON i.taskId = t.id
-               WHERE t.id = :taskId
-               GROUP BY t.id, t.name, t.assigneeId, t.dueDate, t.description, t.statusId, t.priorityId, t.isActive
-               """
+            value = """
+                    SELECT new com.faisal.taskmanager.task.TaskResponseDto(
+                        t.id,
+                        t.name,
+                        t.assigneeId,
+                        t.dueDate,
+                        t.description,
+                        t.statusId,
+                        t.priorityId,
+                        ARRAY_AGG(i.id),
+                        t.isActive
+                    )
+                    FROM Task t
+                    LEFT JOIN Issue i ON i.taskId = t.id
+                    WHERE t.id = :taskId
+                    GROUP BY t.id, t.name, t.assigneeId, t.dueDate, t.description, t.statusId, t.priorityId, t.isActive
+                    """,
+            nativeQuery = true
     )
     Optional<TaskResponseDto> findTaskByIdWithIssueIds(UUID taskId);
 
