@@ -7,6 +7,6 @@ public final class BaseRoutingConstants {
     public final static String ACTIVITY = "/activity";
     public final static String LOOKUP = "/lookup";
 
-    public final static String task = "/task";
-    public final static String issue = "/issue";
+    public final static String TASK = "/task";
+    public final static String ISSUE = "/issue";
 }

@@ -18,7 +18,7 @@ import java.util.UUID;
         description = "Endpoints for Issue operations"
 )
 @RestController
-@RequestMapping(path = BaseRoutingConstants.API + BaseRoutingConstants.V1 + BaseRoutingConstants.issue)
+@RequestMapping(path = BaseRoutingConstants.API + BaseRoutingConstants.V1 + BaseRoutingConstants.ISSUE)
 @RequiredArgsConstructor
 @Validated
 public class IssueController {

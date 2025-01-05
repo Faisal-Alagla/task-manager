@@ -19,7 +19,7 @@ import java.util.UUID;
         description = "Endpoints for Task operations"
 )
 @RestController
-@RequestMapping(path = BaseRoutingConstants.API + BaseRoutingConstants.V1 + BaseRoutingConstants.task)
+@RequestMapping(path = BaseRoutingConstants.API + BaseRoutingConstants.V1 + BaseRoutingConstants.TASK)
 @RequiredArgsConstructor
 public class TaskController {
 
