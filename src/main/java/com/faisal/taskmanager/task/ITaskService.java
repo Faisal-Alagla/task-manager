@@ -1,6 +1,8 @@
 package com.faisal.taskmanager.task;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.UUID;
 
 public interface ITaskService {
@@ -26,7 +28,7 @@ public interface ITaskService {
      *
      * @return a List<TaskResponseDto> containing the tasks data
      */
-    List<TaskResponseDto> getAllTasks();
+    Page<TaskResponseDto> getAllTasks(Pageable pageable);
 
     /**
      * Updates an existing Task in the DB with the matching Task id
