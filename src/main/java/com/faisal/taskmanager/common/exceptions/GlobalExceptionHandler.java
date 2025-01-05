@@ -381,9 +381,25 @@ public class GlobalExceptionHandler {
         log.error("service timeout exception handler", ex);
 
         ErrorResponse errorResponse = createErrorResponse(ErrorMessage.DATA_INTEGRITY_VIOLATION_EXCEPTION);
-        errorResponse.setDescription(ex.getMessage()); //TODO: to be fixed -> clear error message extraction
+        errorResponse.setDescription(extractConstraintViolationMessage(ex.getMessage()));
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    private String extractConstraintViolationMessage(String rawMessage) {
+        if (rawMessage == null) {
+            return "Data integrity violation occurred.";
+        }
+
+        if (rawMessage.contains("violates foreign key constraint")) {
+            return "A foreign key constraint was violated.";
+        } else if (rawMessage.contains("violates unique constraint")) {
+            return "A unique constraint was violated.";
+        } else if (rawMessage.contains("null value in column")) {
+            return "A null value was provided for a column that does not allow nulls.";
+        } else {
+            return "A data integrity constraint was violated.";
+        }
     }
 
 }
