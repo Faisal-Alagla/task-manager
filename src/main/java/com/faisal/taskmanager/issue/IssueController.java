@@ -36,6 +36,7 @@ public class IssueController {
         return new ResponseEntity<>(issueResponseDto, HttpStatus.CREATED);
     }
 
+
     @Operation(
             summary = "Get Issue",
             description = "Get a specific issue by issue id"
@@ -43,6 +44,20 @@ public class IssueController {
     @GetMapping("/{id}")
     public ResponseEntity<IssueResponseDto> getIssue(@PathVariable("id") UUID id) {
         IssueResponseDto issueResponseDto = iIssueService.getIssue(id);
+
+        return new ResponseEntity<>(issueResponseDto, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Update Issue",
+            description = "Update a specific issue by issue id"
+    )
+    @PutMapping("/{id}")
+    public ResponseEntity<IssueResponseDto> updateIssue(
+            @PathVariable("id") UUID id,
+            @Valid @RequestBody IssueUpdateDto issueUpdateDto
+    ) {
+        IssueResponseDto issueResponseDto = iIssueService.updateIssue(issueUpdateDto, id);
 
         return new ResponseEntity<>(issueResponseDto, HttpStatus.OK);
     }

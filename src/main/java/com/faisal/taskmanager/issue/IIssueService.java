@@ -21,6 +21,15 @@ public interface IIssueService {
     IssueResponseDto getIssue(UUID issueId);
 
     /**
+     * Updates an existing Issue in the DB with the matching Issue id
+     *
+     * @param issueUpdateDto IssueUpdateDto object containing the new updated issue data
+     * @param issueId  id of the issue to be updated
+     * @return IssueResponseDto object containing the updated Issue data
+     */
+    IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId);
+
+    /**
      * Soft Deletes an Issue in the DB with the matching Issue id
      *
      * @param issueId id of the Issue to be deleted

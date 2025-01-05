@@ -69,7 +69,7 @@ public class TaskController {
     ) {
         TaskResponseDto taskResponseDto = iTaskService.updateTask(taskUpdateDto, id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(taskResponseDto);
+        return new ResponseEntity<>(taskResponseDto, HttpStatus.OK);
     }
 
     @Operation(
