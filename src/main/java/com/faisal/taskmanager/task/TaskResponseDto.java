@@ -32,6 +32,4 @@ public class TaskResponseDto {
 
     private List<UUID> issuesIds;
 
-    private Boolean isActive;
-
 }

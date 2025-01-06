@@ -26,6 +26,4 @@ public class IssueResponseDto {
 
     private UUID taskId;
 
-    private Boolean isActive;
-
 }

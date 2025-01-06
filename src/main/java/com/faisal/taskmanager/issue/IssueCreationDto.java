@@ -24,6 +24,11 @@ public class IssueCreationDto {
 
     private Integer criticalityId;
 
+    @Schema(
+            description = "The Id of the task associated with the issue",
+            example = "550e8400-e29b-41d4-a716-446655440000"
+    )
+    //TODO: doesn't appear in API doc
     private UUID taskId;
 
 }

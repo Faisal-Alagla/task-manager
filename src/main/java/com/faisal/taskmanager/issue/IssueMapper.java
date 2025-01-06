@@ -17,7 +17,6 @@ public class IssueMapper {
                 .taskId(issue.getTaskId())
                 .statusId(issue.getStatusId())
                 .criticalityId(issue.getCriticalityId())
-                .isActive(issue.getIsActive())
                 .build();
     }
 

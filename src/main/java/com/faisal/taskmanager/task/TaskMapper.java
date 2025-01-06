@@ -18,7 +18,6 @@ public class TaskMapper {
                 .description(task.getDescription())
                 .statusId(task.getStatusId())
                 .priorityId(task.getPriorityId())
-                .isActive(task.getIsActive())
                 .build();
     }
 

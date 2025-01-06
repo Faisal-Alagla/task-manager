@@ -40,7 +40,7 @@ public class BaseEntity {
     @Column(name = "updated_by", insertable = false)
     private UUID updatedBy;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", insertable = false)
     private Boolean isActive;
 
 }

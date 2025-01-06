@@ -50,7 +50,7 @@ public class TaskService implements ITaskService {
         taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
 
-        taskRepository.deleteById(taskId);
+        taskRepository.deactivateTaskAndIssues(taskId);
     }
 
     private void updateTaskData(Task task, TaskUpdateDto taskUpdateDto) {

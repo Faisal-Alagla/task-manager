@@ -16,6 +16,7 @@ public class IssueService implements IIssueService {
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
+        //TODO: check if task is active first (validation on taskId)
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
 
         return IssueMapper.mapToIssueResponseDto(createdIssue);
@@ -45,7 +46,7 @@ public class IssueService implements IIssueService {
         issueRepository.findById(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
-        issueRepository.deleteById(issueId);
+        issueRepository.deactivateIssue(issueId);
     }
 
     private void updateIssueData(Issue issue, IssueUpdateDto issueUpdateDto) {
