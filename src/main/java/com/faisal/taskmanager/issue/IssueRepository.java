@@ -8,10 +8,8 @@ import java.util.UUID;
 
 public interface IssueRepository extends JpaRepository<Issue, UUID> {
 
-    //TODO: with pagination
-//    List<Issue> findAllByTaskId(UUID taskId);
-
     @Modifying
     @Query("UPDATE Issue i SET i.isActive = false WHERE i.id = :id")
     void deleteById(UUID id);
+
 }
