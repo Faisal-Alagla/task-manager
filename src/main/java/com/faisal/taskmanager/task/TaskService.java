@@ -1,5 +1,7 @@
 package com.faisal.taskmanager.task;
 
+import com.faisal.taskmanager.common.exceptions.ErrorMessage;
+import com.faisal.taskmanager.common.exceptions.ResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,7 @@ public class TaskService implements ITaskService {
     @Override
     public TaskResponseDto getTask(UUID taskId) {
         return taskRepository.findTaskByIdWithIssueIds(taskId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
     }
 
     @Override
@@ -35,7 +37,7 @@ public class TaskService implements ITaskService {
     @Override
     public TaskResponseDto updateTask(TaskUpdateDto taskUpdateDto, UUID taskId) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
 
         updateTaskData(task, taskUpdateDto);
         Task updatedTask = taskRepository.save(task);
@@ -46,7 +48,7 @@ public class TaskService implements ITaskService {
     @Override
     public void deleteTask(UUID taskId) {
         taskRepository.findById(taskId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
 
         taskRepository.deleteById(taskId);
     }

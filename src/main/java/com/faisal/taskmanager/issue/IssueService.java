@@ -1,5 +1,7 @@
 package com.faisal.taskmanager.issue;
 
+import com.faisal.taskmanager.common.exceptions.ErrorMessage;
+import com.faisal.taskmanager.common.exceptions.ResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,7 @@ public class IssueService implements IIssueService {
     @Override
     public IssueResponseDto getIssue(UUID issueId) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
         return IssueMapper.mapToIssueResponseDto(issue);
     }
@@ -30,7 +32,7 @@ public class IssueService implements IIssueService {
     @Override
     public IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId) {
         Issue issue = issueRepository.findById(issueId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
         updateIssueData(issue, issueUpdateDto);
         Issue updatedIssue = issueRepository.save(issue);
@@ -41,7 +43,7 @@ public class IssueService implements IIssueService {
     @Override
     public void deleteIssue(UUID issueId) {
         issueRepository.findById(issueId)
-                .orElseThrow(RuntimeException::new); //TODO: to be changed with custom exception
+                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
         issueRepository.deleteById(issueId);
     }

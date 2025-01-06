@@ -16,8 +16,10 @@ public enum ErrorMessage {
     DATA_INTEGRITY_VIOLATION_EXCEPTION(1_007, "Data integrity violation exception"),
 
     //task
+    TASK_NOT_FOUND(2_000, "Task not found"),
 
     //issue
+    ISSUE_NOT_FOUND(2_100, "Issue not found"),
 
     //lookup,
 
