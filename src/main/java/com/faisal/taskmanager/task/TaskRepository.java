@@ -2,6 +2,7 @@ package com.faisal.taskmanager.task;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,27 +32,25 @@ public class TaskRepository {
         return taskJpa.findById(id);
     }
 
-    Optional<TaskResponseDto> findTaskByIdWithIssueIds(UUID taskId) {
+    Tuple findTaskByIdWithIssueIds(UUID taskId) {
 
-        //FIXME: bugged
         String query = """
-                SELECT new com.faisal.taskmanager.task.TaskResponseDto(
-                    t.id,
-                    t.name,
-                    t.assigneeId,
-                    t.dueDate,
-                    t.description,
-                    t.statusId,
-                    t.priorityId,
-                    ARRAY_AGG(i.id)
-                )
-                FROM Task t
-                LEFT JOIN Issue i ON i.taskId = t.id AND i.is_active = true
+                SELECT
+                    t.id AS id,
+                    t.name as name,
+                    t.assignee_id AS assigneeId,
+                    t.due_date AS dueDate,
+                    t.description AS description,
+                    t.status_id AS statusId,
+                    t.priority_id AS priorityId,
+                    ARRAY_AGG(i.id) AS issuesIds
+                FROM task t
+                LEFT JOIN issue i ON i.task_Id = t.id AND i.is_active = true
                 WHERE t.id = :taskId AND t.is_active = true
-                GROUP BY t.id, t.name, t.assigneeId, t.dueDate, t.description, t.statusId, t.priorityId, t.isActive
+                GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
                 """;
 
-        return (Optional<TaskResponseDto>) entityManager.createNativeQuery(query, TaskResponseDto.class)
+        return (Tuple) entityManager.createNativeQuery(query, Tuple.class)
                 .setParameter("taskId", taskId)
                 .getSingleResult();
     }

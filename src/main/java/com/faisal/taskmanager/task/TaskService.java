@@ -25,8 +25,9 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto getTask(UUID taskId) {
-        return taskRepository.findTaskByIdWithIssueIds(taskId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+        return TaskMapper.mapToTaskResponseFromTuple(
+                taskRepository.findTaskByIdWithIssueIds(taskId)
+        );
     }
 
     @Override

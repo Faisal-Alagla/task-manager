@@ -1,6 +1,12 @@
 package com.faisal.taskmanager.task;
 
 
+import jakarta.persistence.Tuple;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
 public class TaskMapper {
 
     /**
@@ -36,6 +42,20 @@ public class TaskMapper {
                 .statusId(taskCreationDto.getStatusId())
                 .priorityId(taskCreationDto.getPriorityId())
                 .build();
+    }
+
+    public static TaskResponseDto mapToTaskResponseFromTuple(Tuple tuple) {
+        //FIXME: convert db result from timestamp to LocalDateTime for dueDate
+        return new TaskResponseDto(
+                tuple.get("id", UUID.class),
+                tuple.get("name", String.class),
+                tuple.get("assigneeId", UUID.class),
+                tuple.get("dueDate", LocalDateTime.class),
+                tuple.get("description", String.class),
+                tuple.get("statusId", Integer.class),
+                tuple.get("priorityId", Integer.class),
+                tuple.get("issuesIds", List.class)
+        );
     }
 
 }
