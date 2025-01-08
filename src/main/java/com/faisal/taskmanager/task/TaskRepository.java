@@ -1,51 +1,63 @@
 package com.faisal.taskmanager.task;
 
-import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TaskRepository extends JpaRepository<Task, UUID> {
+@Repository
+@RequiredArgsConstructor
+public class TaskRepository {
 
-    @Query(
-            //TODO: to be fixed...
-            value = """
-                    SELECT new com.faisal.taskmanager.task.TaskResponseDto(
-                        t.id,
-                        t.name,
-                        t.assigneeId,
-                        t.dueDate,
-                        t.description,
-                        t.statusId,
-                        t.priorityId,
-                        ARRAY_AGG(i.id)
-                    )
-                    FROM Task t
-                    LEFT JOIN Issue i ON i.taskId = t.id AND i.is_active = true
-                    WHERE t.id = :taskId AND t.is_active = true
-                    GROUP BY t.id, t.name, t.assigneeId, t.dueDate, t.description, t.statusId, t.priorityId, t.isActive
-                    """,
-            nativeQuery = true
-    )
-    Optional<TaskResponseDto> findTaskByIdWithIssueIds(UUID taskId);
+    private final TaskJpa taskJpa;
 
-    @Transactional
-    @Modifying
-    @Query(value = """
-            WITH update_task AS (
-                UPDATE task
-                SET is_active = FALSE
-                WHERE id = :taskId
-                RETURNING id
-            )
-            UPDATE issue
-            SET is_active = FALSE
-            WHERE task_id IN (SELECT id FROM update_task)
-            """,
-            nativeQuery = true)
-    void deactivateTaskAndIssues(UUID taskId);
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public Task save(Task task) {
+        return taskJpa.save(task);
+    }
+
+    public Page<Task> findAll(Pageable pageable) {
+        return taskJpa.findAll(pageable);
+    }
+
+    public Optional<Task> findById(UUID id) {
+        return taskJpa.findById(id);
+    }
+
+    Optional<TaskResponseDto> findTaskByIdWithIssueIds(UUID taskId) {
+
+        //FIXME: bugged
+        String query = """
+                SELECT new com.faisal.taskmanager.task.TaskResponseDto(
+                    t.id,
+                    t.name,
+                    t.assigneeId,
+                    t.dueDate,
+                    t.description,
+                    t.statusId,
+                    t.priorityId,
+                    ARRAY_AGG(i.id)
+                )
+                FROM Task t
+                LEFT JOIN Issue i ON i.taskId = t.id AND i.is_active = true
+                WHERE t.id = :taskId AND t.is_active = true
+                GROUP BY t.id, t.name, t.assigneeId, t.dueDate, t.description, t.statusId, t.priorityId, t.isActive
+                """;
+
+        return (Optional<TaskResponseDto>) entityManager.createNativeQuery(query, TaskResponseDto.class)
+                .setParameter("taskId", taskId)
+                .getSingleResult();
+    }
+
+    void deactivateTaskAndIssues(UUID taskId) {
+        taskJpa.deactivateTaskAndIssues(taskId);
+    }
 
 }
