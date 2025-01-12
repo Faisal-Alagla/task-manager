@@ -32,7 +32,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
-        return taskRepository.findAll(pageable).map(TaskMapper::mapToTaskResponseDto);
+        return taskRepository.findAllTasksWithIssueIds(pageable).map(TaskMapper::mapToTaskResponseFromTuple);
     }
 
     @Override

@@ -5,9 +5,11 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,10 +29,6 @@ public class TaskRepository {
         return taskJpaRepository.save(task);
     }
 
-    public Page<Task> findAll(Pageable pageable) {
-        return taskJpaRepository.findAll(pageable);
-    }
-
     public Optional<Task> findById(UUID id) {
         return taskJpaRepository.findById(id);
     }
@@ -42,26 +40,56 @@ public class TaskRepository {
 
     //region EntityManager methods
     Tuple findTaskByIdWithIssueIds(UUID taskId) {
-
-        String query = """
-                SELECT
-                    t.id AS id,
-                    t.name as name,
-                    t.assignee_id AS assigneeId,
-                    t.due_date AS dueDate,
-                    t.description AS description,
-                    t.status_id AS statusId,
-                    t.priority_id AS priorityId,
-                    ARRAY_AGG(i.id) AS issuesIds
-                FROM task t
-                LEFT JOIN issue i ON i.task_Id = t.id AND i.is_active = true
-                WHERE t.id = :taskId AND t.is_active = true
-                GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
-                """;
+        String query = buildTaskWithIssueIdsQuery(true);
 
         return (Tuple) entityManager.createNativeQuery(query, Tuple.class)
                 .setParameter("taskId", taskId)
                 .getSingleResult();
+    }
+
+    public Page<Tuple> findAllTasksWithIssueIds(Pageable pageable) {
+        String query = buildTaskWithIssueIdsQuery(false);
+
+        String countQuery = """
+            SELECT COUNT(*)
+            FROM task t
+            WHERE t.is_active = true
+            """;
+
+        long total = ((Number) entityManager.createNativeQuery(countQuery)
+                .getSingleResult()).longValue();
+
+        List<Tuple> results = entityManager.createNativeQuery(query, Tuple.class)
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+
+        return new PageImpl<>(results, pageable, total);
+    }
+
+    private String buildTaskWithIssueIdsQuery(boolean includeTaskIdFilter) {
+        String baseQuery = """
+            SELECT
+                t.id AS id,
+                t.name AS name,
+                t.assignee_id AS assigneeId,
+                t.due_date AS dueDate,
+                t.description AS description,
+                t.status_id AS statusId,
+                t.priority_id AS priorityId,
+                ARRAY_AGG(i.id) AS issuesIds
+            FROM task t
+            LEFT JOIN issue i ON i.task_id = t.id AND i.is_active = true
+            WHERE t.is_active = true
+            """;
+
+        if (includeTaskIdFilter) {
+            baseQuery += " AND t.id = :taskId ";
+        }
+
+        return baseQuery + """
+            GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
+            """;
     }
     //endregion
 
