@@ -3,7 +3,9 @@ package com.faisal.taskmanager.task;
 
 import jakarta.persistence.Tuple;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,17 +46,29 @@ public class TaskMapper {
                 .build();
     }
 
+    /**
+     * maps a Tuple object to TaskResponseDto
+     *
+     * @param tuple The database result tuple when fetching a task with the ids of issues relating to it
+     * @return TaskResponseDto object containing the fetched data
+     */
     public static TaskResponseDto mapToTaskResponseFromTuple(Tuple tuple) {
-        //FIXME: convert db result from timestamp to LocalDateTime for dueDate
+
+        Timestamp dueDateTimestamp = tuple.get("dueDate", Timestamp.class);
+        LocalDateTime dueDate = dueDateTimestamp != null ? dueDateTimestamp.toLocalDateTime() : null;
+
+        UUID[] issuesArray = tuple.get("issuesIds", UUID[].class);
+        List<UUID> issuesIds = Arrays.asList(issuesArray);
+
         return new TaskResponseDto(
                 tuple.get("id", UUID.class),
                 tuple.get("name", String.class),
                 tuple.get("assigneeId", UUID.class),
-                tuple.get("dueDate", LocalDateTime.class),
+                dueDate,
                 tuple.get("description", String.class),
                 tuple.get("statusId", Integer.class),
                 tuple.get("priorityId", Integer.class),
-                tuple.get("issuesIds", List.class)
+                issuesIds
         );
     }
 

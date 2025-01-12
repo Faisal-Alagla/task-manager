@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.UUID;
 
-public interface TaskJpa extends JpaRepository<Task, UUID> {
+public interface TaskJpaRepository extends JpaRepository<Task, UUID> {
 
     @Transactional
     @Modifying

@@ -15,23 +15,32 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TaskRepository {
 
-    private final TaskJpa taskJpa;
+    //Delegate to TaskJpaRepository for straightforward CRUD operations and generated queries
+    private final TaskJpaRepository taskJpaRepository;
 
+    //Use EntityManager for advanced or custom queries that cannot be handled by JpaRepository
     @PersistenceContext
     private EntityManager entityManager;
 
+    //region TaskJpaRepository methods
     public Task save(Task task) {
-        return taskJpa.save(task);
+        return taskJpaRepository.save(task);
     }
 
     public Page<Task> findAll(Pageable pageable) {
-        return taskJpa.findAll(pageable);
+        return taskJpaRepository.findAll(pageable);
     }
 
     public Optional<Task> findById(UUID id) {
-        return taskJpa.findById(id);
+        return taskJpaRepository.findById(id);
     }
 
+    void deactivateTaskAndIssues(UUID taskId) {
+        taskJpaRepository.deactivateTaskAndIssues(taskId);
+    }
+    //endregion
+
+    //region EntityManager methods
     Tuple findTaskByIdWithIssueIds(UUID taskId) {
 
         String query = """
@@ -54,9 +63,6 @@ public class TaskRepository {
                 .setParameter("taskId", taskId)
                 .getSingleResult();
     }
-
-    void deactivateTaskAndIssues(UUID taskId) {
-        taskJpa.deactivateTaskAndIssues(taskId);
-    }
+    //endregion
 
 }
