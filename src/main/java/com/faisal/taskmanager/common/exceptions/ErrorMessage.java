@@ -22,6 +22,10 @@ public enum ErrorMessage {
     ISSUE_NOT_FOUND(2_100, "Issue not found"),
 
     //lookup,
+    ISSUE_CRITICALITY_NOT_FOUND(3_000, "Issue criticality not found"),
+    ISSUE_STATUS_NOT_FOUND(3_001, "Issue status not found"),
+    TASK_PRIORITY_NOT_FOUND(3_001, "Task priority not found"),
+    TASK_STATUS_NOT_FOUND(3_001, "Task status not found"),
 
     //activity
 

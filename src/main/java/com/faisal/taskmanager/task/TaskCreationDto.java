@@ -1,5 +1,8 @@
 package com.faisal.taskmanager.task;
 
+import com.faisal.taskmanager.common.exceptions.ErrorMessage;
+import com.faisal.taskmanager.common.lookups.LookupType;
+import com.faisal.taskmanager.utils.validations.LookupValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,8 +28,16 @@ public class TaskCreationDto {
 
     private String description;
 
+    @LookupValidation(
+            lookupType = LookupType.TASK_STATUS,
+            errorMessage = ErrorMessage.TASK_STATUS_NOT_FOUND
+    )
     private Integer statusId;
 
+    @LookupValidation(
+            lookupType = LookupType.TASK_PRIORITY,
+            errorMessage = ErrorMessage.TASK_PRIORITY_NOT_FOUND
+    )
     private Integer priorityId;
 
 }
