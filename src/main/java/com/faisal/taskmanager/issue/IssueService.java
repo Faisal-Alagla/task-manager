@@ -16,7 +16,6 @@ public class IssueService implements IIssueService {
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
-        //TODO: check if task is active first (validation on taskId)
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
 
         return IssueMapper.mapToIssueResponseDto(createdIssue);
