@@ -37,7 +37,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto updateTask(TaskUpdateDto taskUpdateDto, UUID taskId) {
-        Task task = taskRepository.findById(taskId)
+        Task task = taskRepository.findByIdAndIsActiveTrue(taskId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
 
         updateTaskData(task, taskUpdateDto);
@@ -48,10 +48,15 @@ public class TaskService implements ITaskService {
 
     @Override
     public void deleteTask(UUID taskId) {
-        taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+        if (!taskExists(taskId)) {
+            throw new ResourceException(ErrorMessage.TASK_NOT_FOUND);
+        }
 
         taskRepository.deactivateTaskAndIssues(taskId);
+    }
+
+    public boolean taskExists(UUID taskId) {
+        return taskRepository.findByIdAndIsActiveTrue(taskId).isPresent();
     }
 
     private void updateTaskData(Task task, TaskUpdateDto taskUpdateDto) {

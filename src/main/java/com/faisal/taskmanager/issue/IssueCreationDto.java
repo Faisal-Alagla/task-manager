@@ -3,6 +3,7 @@ package com.faisal.taskmanager.issue;
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.lookups.LookupType;
 import com.faisal.taskmanager.utils.validations.LookupValidation;
+import com.faisal.taskmanager.utils.validations.TaskExistsValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -36,9 +37,10 @@ public class IssueCreationDto {
     private Integer criticalityId;
 
     @Schema(
-            description = "The Id of the task associated with the issue",
+            description = "The Id of the associated task",
             example = "550e8400-e29b-41d4-a716-446655440000"
     )
+    @TaskExistsValidation
     //FIXME: doesn't appear in API doc
     private UUID taskId;
 

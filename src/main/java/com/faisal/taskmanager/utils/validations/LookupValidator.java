@@ -4,19 +4,17 @@ import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.common.lookups.LookupType;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class LookupValidator implements ConstraintValidator<LookupValidation, Object> {
 
     private final LookupService lookupService;
     private LookupType lookupType;
     private String errorMessage;
     private boolean isNullable;
-
-    public LookupValidator(LookupService lookupService) {
-        this.lookupService = lookupService;
-    }
 
     @Override
     public void initialize(LookupValidation constraintAnnotation) {
