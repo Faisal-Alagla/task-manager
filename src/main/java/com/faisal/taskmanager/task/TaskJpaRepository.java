@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface TaskJpaRepository extends JpaRepository<Task, UUID> {
 
-    Optional<Task> findByIdAndIsActiveTrue(UUID id);
+    Optional<Task> findByIdAndIsActiveTrue(UUID taskId);
 
     @Transactional
     @Modifying

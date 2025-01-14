@@ -20,6 +20,9 @@ databaseChangeLog:
   - include:
       file: entities/task/task_ddl_20241230.yaml
       relativeToChangelogFile: true
+  - include:
+      file: entities/activity-log/activity_log_ddl_20250114.yaml
+      relativeToChangelogFile: true
 
   # Constraints Setup
   - include:

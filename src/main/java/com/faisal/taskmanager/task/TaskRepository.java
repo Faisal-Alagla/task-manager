@@ -29,8 +29,8 @@ public class TaskRepository {
         return taskJpaRepository.save(task);
     }
 
-    public Optional<Task> findByIdAndIsActiveTrue(UUID id) {
-        return taskJpaRepository.findByIdAndIsActiveTrue(id);
+    public Optional<Task> findByIdAndIsActiveTrue(UUID taskId) {
+        return taskJpaRepository.findByIdAndIsActiveTrue(taskId);
     }
 
     void deactivateTaskAndIssues(UUID taskId) {

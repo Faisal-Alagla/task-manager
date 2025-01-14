@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: activity_log_ddl_20250114
+      author: FAlagla
+      changes:
+        - createTable:
+            tableName: activity_log
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: activity_log_pkey
+              - column:
+                  defaultValueComputed: now()
+                  name: created_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  defaultValueComputed: now()
+                  name: updated_at
+                  type: TIMESTAMP WITHOUT TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: http_method
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: uri
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: operation
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: operation_reference_id
+                  type: VARCHAR
+              - column:
+                  name: message
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID

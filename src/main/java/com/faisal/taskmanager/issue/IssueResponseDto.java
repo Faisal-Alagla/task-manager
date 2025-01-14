@@ -1,5 +1,6 @@
 package com.faisal.taskmanager.issue;
 
+import com.faisal.taskmanager.utils.Interfaces.BaseResponseDtoInterface;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.util.UUID;
         name = "IssueResponse",
         description = "Schema to hold Issue information as a response"
 )
-public class IssueResponseDto {
+public class IssueResponseDto implements BaseResponseDtoInterface {
 
     private UUID id;
 

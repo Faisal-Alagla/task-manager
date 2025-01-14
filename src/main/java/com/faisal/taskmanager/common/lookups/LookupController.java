@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping(BaseRoutingConstants.API + BaseRoutingConstants.V1 + BaseRoutingConstants.LOOKUP)
 @RequiredArgsConstructor
-@NoActivityLogging //TODO: to skip logging lookup operations when activity logging is implemented
+@NoActivityLogging
 public class LookupController {
 
     private final LookupService lookupService;
