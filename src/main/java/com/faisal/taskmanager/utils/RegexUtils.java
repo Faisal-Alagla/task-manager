@@ -35,25 +35,6 @@ public class RegexUtils {
             SPACE +
             "]+$";
 
-    public static final String EMAIL_PATTERN = "^" +
-            "[A-Za-z0-9]" +
-            "([_\\-\\.]{0,1}[A-Za-z0-9]+)*" +
-            "@" +
-            "([A-Za-z0-9]+\\.)+" +
-            "[A-Za-z0-9]{2,}" +
-            "$";
-
-    public static final String MOBILE_PATTERN = "^" +
-            "(\\+\\d{1,3}[\\-\\s]{0,1}){0,1}" +
-            "\\d{9,10}" +
-            "$";
-
-    public static final String PERSON_NAME_PATTERN = "^" +
-            "([" + ENGLISH_LITTERS + "]{1}([\\s]{1}[" + ENGLISH_LITTERS + "])+)" +
-            "|" +
-            "([" + ARABIC_LITTERS + "]{1}([\\s]{1}[" + ARABIC_LITTERS + "])+)" +
-            "$";
-
     private static final Pattern UUID_REGEX = Pattern.compile(UUID_PATTERN);
     private static final Pattern ALLOWED_SEARCH_REGEX = Pattern.compile(ALLOWED_SEARCH_PATTERN);
 
