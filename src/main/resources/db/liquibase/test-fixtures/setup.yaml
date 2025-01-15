@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: load_task_20250115.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: load_issue_20250115.yaml
+      relativeToChangelogFile: true

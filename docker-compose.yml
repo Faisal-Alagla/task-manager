@@ -14,9 +14,10 @@ services:
     build: .
     image: faisalagla/task-manager
     environment:
-      - DB_URL=jdbc:postgresql://db:5432/task-manager
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
+      ENV: dev
+      DB_URL: jdbc:postgresql://db:5432/task-manager
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
     ports:
       - "8080:8080"
     networks:

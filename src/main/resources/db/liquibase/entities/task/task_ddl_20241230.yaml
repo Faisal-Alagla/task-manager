@@ -38,7 +38,7 @@ databaseChangeLog:
                   type: TIMESTAMP WITHOUT TIME ZONE
               - column:
                   name: description
-                  type: TEXT
+                  type: VARCHAR
               - column:
                   name: status_id
                   type: INT

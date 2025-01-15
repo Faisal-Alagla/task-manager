@@ -49,3 +49,7 @@ databaseChangeLog:
   # Changelog
 
   # Test Fixture
+  - include:
+      context: "dev, test"
+      file: test-fixtures/setup.yaml
+      relativeToChangelogFile: true

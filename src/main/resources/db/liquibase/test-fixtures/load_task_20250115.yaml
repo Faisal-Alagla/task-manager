@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: load_task_20250115
+      author: Faisal
+      changes:
+        - loadData:
+            tableName: task
+            file: classpath:db/liquibase/test-fixtures/data/task.csv
+            encoding: UTF-8

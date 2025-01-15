@@ -32,7 +32,7 @@ databaseChangeLog:
                   type: VARCHAR
               - column:
                   name: description
-                  type: TEXT
+                  type: VARCHAR
               - column:
                   name: task_id
                   type: UUID

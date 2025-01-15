@@ -11,4 +11,5 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
   liquibase:
+    contexts: ${ENV:prod}
     change-log: classpath:/db/liquibase/master.yaml
