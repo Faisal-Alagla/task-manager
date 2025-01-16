@@ -13,24 +13,6 @@ import java.util.UUID;
 public class TaskMapper {
 
     /**
-     * maps a Task object to TaskResponseDto
-     *
-     * @param task The Task object
-     * @return TaskResponseDto object containing the passed Task's data
-     */
-    public static TaskResponseDto mapToTaskResponseDto(Task task) {
-        return TaskResponseDto.builder()
-                .id(task.getId())
-                .assigneeId(task.getAssigneeId())
-                .name(task.getName())
-                .dueDate(task.getDueDate())
-                .description(task.getDescription())
-                .statusId(task.getStatusId())
-                .priorityId(task.getPriorityId())
-                .build();
-    }
-
-    /**
      * maps a TaskCreationDto object to Task
      *
      * @param taskCreationDto The TaskCreationDto object

@@ -3,6 +3,7 @@ package com.faisal.taskmanager.task;
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.lookups.LookupType;
 import com.faisal.taskmanager.utils.validations.LookupValidation;
+import com.faisal.taskmanager.utils.validations.TaskExistsValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,9 @@ import java.util.UUID;
         description = "Schema to hold Task information"
 )
 public class TaskCreationDto {
+
+    @TaskExistsValidation
+    private UUID parentTaskId;
 
     @NotBlank(message = "task name can't be empty")
     @Size(max = 50, message = "name length can't be greater than 50 characters")

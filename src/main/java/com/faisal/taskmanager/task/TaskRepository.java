@@ -4,10 +4,12 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,9 +19,6 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class TaskRepository {
-
-    //TODO: change the other queries to have the task_closure table updated based on new additions / or certain updates
-
     //Delegate to TaskJpaRepository for straightforward CRUD operations and generated queries
     private final TaskJpaRepository taskJpaRepository;
 
@@ -35,13 +34,85 @@ public class TaskRepository {
     public Optional<Task> findByIdAndIsActiveTrue(UUID taskId) {
         return taskJpaRepository.findByIdAndIsActiveTrue(taskId);
     }
-
-    void deactivateTaskAndIssues(UUID taskId) {
-        taskJpaRepository.deactivateTaskAndIssues(taskId);
-    }
     //endregion
 
     //region EntityManager methods
+    @Modifying
+    @Transactional
+    public Task saveWithClosure(Task task, UUID parentTaskId) {
+        Task savedTask = taskJpaRepository.save(task);
+
+        entityManager.createNativeQuery("""
+                        INSERT INTO task_closure (ancestor_task_id, descendant_task_id, depth)
+                        VALUES (:taskId, :taskId, 0)
+                        """)
+                .setParameter("taskId", savedTask.getId())
+                .executeUpdate();
+
+        if (parentTaskId != null) {
+            entityManager.createNativeQuery("""
+                            INSERT INTO task_closure (ancestor_task_id, descendant_task_id, depth)
+                            SELECT tc.ancestor_task_id, :childId, tc.depth + 1
+                            FROM task_closure tc
+                            WHERE tc.descendant_task_id = :parentId
+                            """)
+                    .setParameter("childId", savedTask.getId())
+                    .setParameter("parentId", parentTaskId)
+                    .executeUpdate();
+        }
+
+        return savedTask;
+    }
+
+    @Modifying
+    @Transactional
+    public void updateTaskAndDescendantsStatus(UUID taskId, Integer statusId) {
+        entityManager.createNativeQuery("""
+                        UPDATE task
+                        SET status_id = :statusId,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE id IN (
+                            SELECT descendant_task_id
+                            FROM task_closure
+                            WHERE ancestor_task_id = :taskId
+                        )
+                        """)
+                .setParameter("taskId", taskId)
+                .setParameter("statusId", statusId)
+                .executeUpdate();
+    }
+
+    @Modifying
+    @Transactional
+    public void deactivateTaskAndDescendants(UUID taskId) {
+        entityManager.createNativeQuery("""
+                        WITH RECURSIVE descendants AS (
+                            SELECT descendant_task_id
+                            FROM task_closure
+                            WHERE ancestor_task_id = :taskId
+                        )
+                        UPDATE task
+                        SET is_active = false,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE id IN (SELECT descendant_task_id FROM descendants)
+                        """)
+                .setParameter("taskId", taskId)
+                .executeUpdate();
+
+        entityManager.createNativeQuery("""
+                        UPDATE issue
+                        SET is_active = false,
+                            updated_at = CURRENT_TIMESTAMP
+                        WHERE task_id IN (
+                            SELECT descendant_task_id
+                            FROM task_closure
+                            WHERE ancestor_task_id = :taskId
+                        )
+                        """)
+                .setParameter("taskId", taskId)
+                .executeUpdate();
+    }
+
     public Optional<Tuple> findTaskByIdWithRelations(UUID taskId) {
         String query = buildTaskWithRelationsQuery(true);
         try {
