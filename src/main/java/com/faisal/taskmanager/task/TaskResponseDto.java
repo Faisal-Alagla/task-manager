@@ -33,4 +33,8 @@ public class TaskResponseDto implements BaseResponseDtoInterface {
 
     private List<UUID> issuesIds;
 
+    private UUID parentTaskId;
+
+    private List<UUID> childTaskIds;
+
 }

@@ -25,14 +25,15 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto getTask(UUID taskId) {
-        return TaskMapper.mapToTaskResponseFromTuple(
-                taskRepository.findTaskByIdWithIssueIds(taskId)
-        );
+        return taskRepository.findTaskByIdWithRelations(taskId)
+                .map(TaskMapper::mapToTaskResponseFromTuple)
+                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
     }
 
     @Override
     public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
-        return taskRepository.findAllTasksWithIssueIds(pageable).map(TaskMapper::mapToTaskResponseFromTuple);
+        return taskRepository.findAllTasksWithRelations(pageable)
+                .map(TaskMapper::mapToTaskResponseFromTuple);
     }
 
     @Override

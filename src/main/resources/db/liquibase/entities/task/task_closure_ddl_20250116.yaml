@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: task_closure_ddl_20250116
+      author: Faisal
+      changes:
+        - createTable:
+            tableName: task_closure
+            columns:
+              - column:
+                  name: ancestor_task_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: descendant_task_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: depth
+                  type: INT
+                  constraints:
+                    nullable: false
+        - addPrimaryKey:
+            tableName: task_closure
+            columnNames: ancestor_task_id, descendant_task_id
+            constraintName: task_closure_pkey

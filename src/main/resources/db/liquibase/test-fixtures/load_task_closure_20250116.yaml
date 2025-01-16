@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: load_task_closure_20250116
+      author: Faisal
+      changes:
+        - loadData:
+            tableName: task_closure
+            file: classpath:db/liquibase/test-fixtures/data/task_closure.csv
+            encoding: UTF-8

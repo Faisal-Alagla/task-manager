@@ -1,6 +1,7 @@
 package com.faisal.taskmanager.task;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class TaskRepository {
+
+    //TODO: change the other queries to have the task_closure table updated based on new additions / or certain updates
 
     //Delegate to TaskJpaRepository for straightforward CRUD operations and generated queries
     private final TaskJpaRepository taskJpaRepository;
@@ -39,22 +42,26 @@ public class TaskRepository {
     //endregion
 
     //region EntityManager methods
-    Tuple findTaskByIdWithIssueIds(UUID taskId) {
-        String query = buildTaskWithIssueIdsQuery(true);
-
-        return (Tuple) entityManager.createNativeQuery(query, Tuple.class)
-                .setParameter("taskId", taskId)
-                .getSingleResult();
+    public Optional<Tuple> findTaskByIdWithRelations(UUID taskId) {
+        String query = buildTaskWithRelationsQuery(true);
+        try {
+            Tuple result = (Tuple) entityManager.createNativeQuery(query, Tuple.class)
+                    .setParameter("taskId", taskId)
+                    .getSingleResult();
+            return Optional.ofNullable(result);
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
-    public Page<Tuple> findAllTasksWithIssueIds(Pageable pageable) {
-        String query = buildTaskWithIssueIdsQuery(false);
+    public Page<Tuple> findAllTasksWithRelations(Pageable pageable) {
+        String query = buildTaskWithRelationsQuery(false);
 
         String countQuery = """
-            SELECT COUNT(*)
-            FROM task t
-            WHERE t.is_active = true
-            """;
+                SELECT COUNT(*)
+                FROM task t
+                WHERE t.is_active = true
+                """;
 
         long total = ((Number) entityManager.createNativeQuery(countQuery)
                 .getSingleResult()).longValue();
@@ -67,29 +74,38 @@ public class TaskRepository {
         return new PageImpl<>(results, pageable, total);
     }
 
-    private String buildTaskWithIssueIdsQuery(boolean includeTaskIdFilter) {
+    private String buildTaskWithRelationsQuery(boolean includeTaskIdFilter) {
         String baseQuery = """
-            SELECT
-                t.id AS id,
-                t.name AS name,
-                t.assignee_id AS assigneeId,
-                t.due_date AS dueDate,
-                t.description AS description,
-                t.status_id AS statusId,
-                t.priority_id AS priorityId,
-                ARRAY_AGG(i.id) AS issuesIds
-            FROM task t
-            LEFT JOIN issue i ON i.task_id = t.id AND i.is_active = true
-            WHERE t.is_active = true
-            """;
+                SELECT
+                    t.id AS id,
+                    t.name AS name,
+                    t.assignee_id AS assigneeId,
+                    t.due_date AS dueDate,
+                    t.description AS description,
+                    t.status_id AS statusId,
+                    t.priority_id AS priorityId,
+                    COALESCE(ARRAY_AGG(DISTINCT i.id) FILTER (WHERE i.id IS NOT NULL), ARRAY[]::uuid[]) AS issuesIds,
+                    (
+                        SELECT ancestor_task_id
+                        FROM task_closure
+                        WHERE descendant_task_id = t.id
+                          AND depth = 1
+                        LIMIT 1
+                    ) AS parentTaskId,
+                    COALESCE(ARRAY_AGG(DISTINCT tc.descendant_task_id) FILTER (WHERE tc.descendant_task_id IS NOT NULL AND tc.depth = 1), ARRAY[]::uuid[]) AS childTaskIds
+                FROM task t
+                LEFT JOIN issue i ON i.task_id = t.id AND i.is_active = true
+                LEFT JOIN task_closure tc ON tc.ancestor_task_id = t.id AND tc.depth = 1
+                WHERE t.is_active = true
+                """;
 
         if (includeTaskIdFilter) {
             baseQuery += " AND t.id = :taskId ";
         }
 
         return baseQuery + """
-            GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
-            """;
+                GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
+                """;
     }
     //endregion
 

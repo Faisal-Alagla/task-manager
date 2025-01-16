@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: ancestor_task_task_id_fkey_20250116
+      author: Faisal
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: ancestor_task_id
+            baseTableName: task_closure
+            constraintName: ancestor_task_task_id_fkey
+            referencedColumnNames: id
+            referencedTableName: task

@@ -5,6 +5,7 @@ import jakarta.persistence.Tuple;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -49,16 +50,22 @@ public class TaskMapper {
     /**
      * maps a Tuple object to TaskResponseDto
      *
-     * @param tuple The database result tuple when fetching a task with the ids of issues relating to it
+     * @param tuple The database result tuple when fetching a task with the ids of its relations
      * @return TaskResponseDto object containing the fetched data
      */
     public static TaskResponseDto mapToTaskResponseFromTuple(Tuple tuple) {
+        if (tuple == null) {
+            return null;
+        }
 
         Timestamp dueDateTimestamp = tuple.get("dueDate", Timestamp.class);
         LocalDateTime dueDate = dueDateTimestamp != null ? dueDateTimestamp.toLocalDateTime() : null;
 
         UUID[] issuesArray = tuple.get("issuesIds", UUID[].class);
-        List<UUID> issuesIds = Arrays.asList(issuesArray);
+        List<UUID> issuesIds = issuesArray != null ? Arrays.asList(issuesArray) : new ArrayList<>();
+
+        UUID[] childTasksArray = tuple.get("childTaskIds", UUID[].class);
+        List<UUID> childTaskIds = childTasksArray != null ? Arrays.asList(childTasksArray) : new ArrayList<>();
 
         return new TaskResponseDto(
                 tuple.get("id", UUID.class),
@@ -68,7 +75,9 @@ public class TaskMapper {
                 tuple.get("description", String.class),
                 tuple.get("statusId", Integer.class),
                 tuple.get("priorityId", Integer.class),
-                issuesIds
+                issuesIds,
+                tuple.get("parentTaskId", UUID.class),
+                childTaskIds
         );
     }
 
