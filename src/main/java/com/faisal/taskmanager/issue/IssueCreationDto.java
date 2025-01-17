@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Schema(
-        name = "Issue",
+        name = "IssueCreationRequest",
         description = "Schema to hold Issue information"
 )
 public class IssueCreationDto {
@@ -38,10 +38,9 @@ public class IssueCreationDto {
 
     @Schema(
             description = "The Id of the associated task",
-            example = "550e8400-e29b-41d4-a716-446655440000"
+            example = "dd4a292c-13fc-449b-aa0f-00582f3db380"
     )
     @TaskExistsValidation
-    //FIXME: doesn't appear in API doc
     private UUID taskId;
 
 }

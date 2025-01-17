@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Schema(
-        name = "Task",
+        name = "TaskUpdateRequest",
         description = "Schema to hold Task information"
 )
 public class TaskUpdateDto {

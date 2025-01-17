@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Schema(
-        name = "Issue",
+        name = "IssueUpdateRequest",
         description = "Schema to hold Issue information"
 )
 public class IssueUpdateDto {
