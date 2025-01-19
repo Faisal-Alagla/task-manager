@@ -13,3 +13,9 @@ spring:
   liquibase:
     contexts: ${ENV:prod}
     change-log: classpath:/db/liquibase/master.yaml
+
+task-manager:
+  env: ${ENV:prod}
+  openapi:
+    dev-url: ${OPENAPI_DEV_URL:localhost:8080}
+    prod-url: ${OPENAPI_PROD_URL:localhost:8080}
