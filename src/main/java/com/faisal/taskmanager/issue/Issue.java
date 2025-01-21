@@ -22,7 +22,7 @@ public class Issue extends BaseEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description")
     private String description;
 
     @Column(name = "status_id")
