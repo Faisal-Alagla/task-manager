@@ -47,10 +47,15 @@ public class IssueService implements IIssueService {
     @Override
     @Transactional
     public void deleteIssue(UUID issueId) {
-        issueRepository.findById(issueId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
+        if (!issueExists(issueId)) {
+            throw new ResourceException(ErrorMessage.ISSUE_NOT_FOUND);
+        }
 
         issueRepository.deactivateIssue(issueId);
+    }
+
+    private boolean issueExists(UUID issueId) {
+        return issueRepository.findByIdAndIsActiveTrue(issueId).isPresent();
     }
 
     private void updateIssueData(Issue issue, IssueUpdateDto issueUpdateDto) {
