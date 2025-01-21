@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -126,7 +127,8 @@ public class TaskRepository {
     }
 
     public Page<Tuple> findAllTasksWithRelations(Pageable pageable) {
-        String query = buildTaskWithRelationsQuery(false);
+        String query = buildTaskWithRelationsQuery(false)
+                        + buildOrderByClause(pageable);
 
         String countQuery = """
                 SELECT COUNT(*)
@@ -177,6 +179,15 @@ public class TaskRepository {
         return baseQuery + """
                 GROUP BY t.id, t.name, t.assignee_id, t.due_date, t.description, t.status_id, t.priority_id, t.is_active
                 """;
+    }
+
+    private String buildOrderByClause(Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            return "";
+        }
+        return " ORDER BY " + pageable.getSort().stream()
+                .map(order -> order.getProperty() + " " + order.getDirection().name())
+                .collect(Collectors.joining(", "));
     }
     //endregion
 
