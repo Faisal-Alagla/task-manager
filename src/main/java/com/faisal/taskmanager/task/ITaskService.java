@@ -50,7 +50,7 @@ public interface ITaskService {
      * Checks whether a Task exists and active
      *
      * @param taskId id of the Task to be deleted
-     * @return true if the tasks exists and active, false otherwise
+     * @return true if the task exists and active, false otherwise
      */
     boolean taskExists(UUID taskId);
 

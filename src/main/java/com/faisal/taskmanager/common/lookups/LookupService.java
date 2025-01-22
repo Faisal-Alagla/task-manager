@@ -31,7 +31,7 @@ public class LookupService {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeLookups() {
-        log.info("filling lookup values");
+        log.info("filling lookup lists...");
 
         issueCriticalityLookupList = lookupRepository.getIssueCriticalityLookup();
         issueStatusLookupList = lookupRepository.getIssueStatusLookup();
@@ -55,7 +55,7 @@ public class LookupService {
                 return taskStatusLookupList.stream().map(LookupResponseDto::fromEntity);
             }
             default -> {
-                log.error("no values for the given lookup type");
+                log.error("no values for the given lookup type: {}", type.name());
                 return null;
             }
         }
