@@ -28,7 +28,7 @@ public class TaskCreationDto {
     private UUID parentTaskId;
 
     @NotBlank(message = "task name can't be empty")
-    @Size(max = 50, message = "name length can't be greater than 50 characters")
+    @Size(max = 50, message = "name length can't be greater than {max} characters")
     private String name;
 
     private UUID assigneeId;
