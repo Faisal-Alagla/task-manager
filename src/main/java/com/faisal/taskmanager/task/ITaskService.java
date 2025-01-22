@@ -46,4 +46,12 @@ public interface ITaskService {
      */
     void deleteTask(UUID taskId);
 
+    /**
+     * Checks whether a Task exists and active
+     *
+     * @param taskId id of the Task to be deleted
+     * @return true if the tasks exists and active, false otherwise
+     */
+    boolean taskExists(UUID taskId);
+
 }

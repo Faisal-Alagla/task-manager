@@ -1,7 +1,7 @@
 package com.faisal.taskmanager.utils.validations;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
-import com.faisal.taskmanager.task.TaskService;
+import com.faisal.taskmanager.task.ITaskService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TaskExistsValidator implements ConstraintValidator<TaskExistsValidation, UUID> {
 
-    private final TaskService taskService;
+    private final ITaskService iTaskService;
 
     private boolean nullable;
 
@@ -27,7 +27,7 @@ public class TaskExistsValidator implements ConstraintValidator<TaskExistsValida
 
         if (taskId == null) return nullable;
 
-        if (!taskService.taskExists(taskId)) {
+        if (!iTaskService.taskExists(taskId)) {
             constraintValidatorContext
                     .buildConstraintViolationWithTemplate(ErrorMessage.TASK_NOT_FOUND.getMessage())
                     .addConstraintViolation();
