@@ -8,48 +8,48 @@ import java.util.UUID;
 public interface ITaskService {
 
     /**
-     * Creates a new Task and store it in the DB
+     * Creates a new task
      *
-     * @param taskCreationDto TaskCreationDto object containing the Task data to be created
-     * @return TaskResponseDto containing the created Task data in the DB
+     * @param taskCreationDto TaskCreationDto object containing the task data to be created
+     * @return TaskResponseDto containing the created task data
      */
     TaskResponseDto createTask(TaskCreationDto taskCreationDto);
 
     /**
-     * Get the Task from the DB with the matching Task id
+     * Get a task by id
      *
      * @param taskId id of the task to be fetched
-     * @return TaskResponseDto object containing the created Task data
+     * @return TaskResponseDto object containing the task data
      */
     TaskResponseDto getTask(UUID taskId);
 
     /**
-     * Gets all Tasks from the DB
+     * Get all active tasks (paginated)
      *
-     * @return a List<TaskResponseDto> containing the tasks data
+     * @return a Page<TaskResponseDto> containing the tasks data
      */
     Page<TaskResponseDto> getAllTasks(Pageable pageable);
 
     /**
-     * Updates an existing Task in the DB with the matching Task id
+     * Update a task by id
      *
-     * @param taskUpdateDto TaskUpdateDto object containing the new updated Task data
+     * @param taskUpdateDto TaskUpdateDto object containing the new task data
      * @param taskId  id of the task to be updated
-     * @return TaskResponseDto object containing the updated Task data
+     * @return TaskResponseDto object containing the updated task data
      */
     TaskResponseDto updateTask(TaskUpdateDto taskUpdateDto, UUID taskId);
 
     /**
-     * Soft deletes a Task in the DB with the matching Task id
+     * Soft delete a task by id
      *
-     * @param taskId id of the Task to be deleted
+     * @param taskId id of the task to be deleted
      */
     void deleteTask(UUID taskId);
 
     /**
-     * Checks whether a Task exists and active
+     * Checks whether a task exists and active
      *
-     * @param taskId id of the Task to be deleted
+     * @param taskId id of the task to be checked
      * @return true if the task exists and active, false otherwise
      */
     boolean taskExists(UUID taskId);

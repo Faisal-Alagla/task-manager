@@ -5,32 +5,32 @@ import java.util.UUID;
 public interface IIssueService {
 
     /**
-     * Creates a new Issue and store it in the DB
+     * Creates a new issue
      *
-     * @param issueCreationDto IssueCreationDto object containing the Issue data to be created
-     * @return IssueResponseDto containing the created Issue data in the DB
+     * @param issueCreationDto IssueCreationDto object containing the issue data to be created
+     * @return IssueResponseDto containing the created issue data
      */
     IssueResponseDto createIssue(IssueCreationDto issueCreationDto);
 
     /**
-     * Gets the Issue from the DB with the matching Issue id
+     * Gets an issue by id
      *
-     * @param issueId id of the Issue to be fetched
-     * @return IssueResponseDto containing the Issue data
+     * @param issueId id of the issue to be fetched
+     * @return IssueResponseDto containing the issue data
      */
     IssueResponseDto getIssue(UUID issueId);
 
     /**
-     * Updates an existing Issue in the DB with the matching Issue id
+     * Update an issue by id
      *
-     * @param issueUpdateDto IssueUpdateDto object containing the new updated issue data
+     * @param issueUpdateDto IssueUpdateDto object containing the new issue data
      * @param issueId  id of the issue to be updated
-     * @return IssueResponseDto object containing the updated Issue data
+     * @return IssueResponseDto object containing the updated issue data
      */
     IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId);
 
     /**
-     * Soft Deletes an Issue in the DB with the matching Issue id
+     * Soft delete an issue by id
      *
      * @param issueId id of the Issue to be deleted
      */
