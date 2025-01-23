@@ -1,6 +1,5 @@
 package com.faisal.taskmanager.task;
 
-
 import jakarta.persistence.Tuple;
 
 import java.sql.Timestamp;

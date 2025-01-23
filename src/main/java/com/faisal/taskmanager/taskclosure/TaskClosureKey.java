@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.task;
+package com.faisal.taskmanager.taskclosure;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
