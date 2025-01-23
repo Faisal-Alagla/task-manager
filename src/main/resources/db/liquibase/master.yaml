@@ -21,7 +21,7 @@ databaseChangeLog:
       file: entities/task/task_ddl_20241230.yaml
       relativeToChangelogFile: true
   - include:
-      file: entities/task/task_closure_ddl_20250116.yaml
+      file: entities/task-closure/task_closure_ddl_20250116.yaml
       relativeToChangelogFile: true
   - include:
       file: entities/activity-log/activity_log_ddl_20250114.yaml
@@ -44,10 +44,10 @@ databaseChangeLog:
       file: entities/task/task_task_status_id_fkey_20241230.yaml
       relativeToChangelogFile: true
   - include:
-      file: entities/task/ancestor_task_task_id_fkey_20250116.yaml
+      file: entities/task-closure/ancestor_task_task_id_fkey_20250116.yaml
       relativeToChangelogFile: true
   - include:
-      file: entities/task/descendant_task_task_id_fkey_20250116.yaml
+      file: entities/task-closure/descendant_task_task_id_fkey_20250116.yaml
       relativeToChangelogFile: true
 
   # Seed Data
