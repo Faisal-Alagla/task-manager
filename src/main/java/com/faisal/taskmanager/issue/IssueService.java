@@ -26,7 +26,7 @@ public class IssueService implements IIssueService {
     @Override
     @Transactional(readOnly = true)
     public IssueResponseDto getIssue(UUID issueId) {
-        Issue issue = issueRepository.findById(issueId)
+        Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
         return IssueMapper.mapToIssueResponseDto(issue);
@@ -35,7 +35,7 @@ public class IssueService implements IIssueService {
     @Override
     @Transactional
     public IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId) {
-        Issue issue = issueRepository.findById(issueId)
+        Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
 
         updateIssueData(issue, issueUpdateDto);
