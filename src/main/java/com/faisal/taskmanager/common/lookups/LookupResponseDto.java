@@ -12,10 +12,10 @@ public class LookupResponseDto {
 
     private String name;
 
-    static LookupResponseDto fromEntity(BaseLookupResponseInterface fileStatus) {
+    static LookupResponseDto fromEntity(BaseLookupResponseInterface item) {
         return new LookupResponseDto(
-                fileStatus.getId(),
-                fileStatus.getName()
+                item.getId(),
+                item.getName()
         );
     }
 }
