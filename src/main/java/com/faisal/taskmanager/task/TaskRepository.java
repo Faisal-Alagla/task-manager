@@ -114,6 +114,7 @@ public class TaskRepository {
                 .executeUpdate();
     }
 
+    @Transactional(readOnly = true)
     public Optional<Tuple> findTaskByIdWithRelations(UUID taskId) {
         String query = buildTaskWithRelationsQuery(true);
         try {
@@ -126,6 +127,7 @@ public class TaskRepository {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<Tuple> findAllTasksWithRelations(Pageable pageable) {
         String query = buildTaskWithRelationsQuery(false)
                         + buildOrderByClause(pageable);

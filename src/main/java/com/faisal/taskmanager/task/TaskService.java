@@ -23,7 +23,6 @@ public class TaskService implements ITaskService {
     private final LookupService lookupService;
 
     @Override
-    @Transactional
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
         Task createdTask = taskRepository.saveWithClosure(
                 TaskMapper.mapToTask(taskCreationDto),
@@ -36,7 +35,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public TaskResponseDto getTask(UUID taskId) {
         return taskRepository.findTaskByIdWithRelations(taskId)
                 .map(TaskMapper::mapToTaskResponseFromTuple)
@@ -44,7 +42,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
         return taskRepository.findAllTasksWithRelations(pageable)
                 .map(TaskMapper::mapToTaskResponseFromTuple);
@@ -80,7 +77,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
     public void deleteTask(UUID taskId) {
         if (!taskExists(taskId)) {
             throw new ResourceException(ErrorMessage.TASK_NOT_FOUND);

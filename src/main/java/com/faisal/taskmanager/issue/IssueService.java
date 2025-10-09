@@ -16,7 +16,6 @@ public class IssueService implements IIssueService {
     private final IssueRepository issueRepository;
 
     @Override
-    @Transactional
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
 
@@ -24,7 +23,6 @@ public class IssueService implements IIssueService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public IssueResponseDto getIssue(UUID issueId) {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
@@ -33,7 +31,6 @@ public class IssueService implements IIssueService {
     }
 
     @Override
-    @Transactional
     public IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId) {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
@@ -45,7 +42,6 @@ public class IssueService implements IIssueService {
     }
 
     @Override
-    @Transactional
     public void deleteIssue(UUID issueId) {
         if (!issueExists(issueId)) {
             throw new ResourceException(ErrorMessage.ISSUE_NOT_FOUND);
