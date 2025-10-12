@@ -5,7 +5,6 @@ import com.faisal.taskmanager.utils.constants.BaseRoutingConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,45 +26,81 @@ public class LookupController {
 
     @Operation(
             summary = "Issue Criticality Lookup",
-            description = "Get all lookups for issue criticality types"
+            description = "Get all lookups for issue criticality types (excluding undefined)"
     )
     @GetMapping("/issue-criticality")
     ResponseEntity<List<LookupResponseDto>> getIssueCriticalityLookup() {
+        List<LookupResponseDto> issueCriticality = lookupService.getIssueCriticalities();
+        return ResponseEntity.ok(issueCriticality);
+    }
 
-        List<LookupResponseDto> issueCriticality = lookupService.getLookup(LookupType.ISSUE_CRITICALITY).toList();
-        return new ResponseEntity<>(issueCriticality, HttpStatus.OK);
+    @Operation(
+            summary = "All Issue Criticality Lookup",
+            description = "Get all lookups for issue criticality types including undefined"
+    )
+    @GetMapping("/issue-criticality/all")
+    ResponseEntity<List<LookupResponseDto>> getAllIssueCriticalityLookup() {
+        List<LookupResponseDto> issueCriticality = lookupService.getAllIssueCriticalities();
+        return ResponseEntity.ok(issueCriticality);
     }
 
     @Operation(
             summary = "Issue Status Lookup",
-            description = "Get all lookups for issue status types"
+            description = "Get all lookups for issue status types (excluding undefined)"
     )
     @GetMapping("/issue-status")
     ResponseEntity<List<LookupResponseDto>> getIssueStatusLookup() {
+        List<LookupResponseDto> issueStatus = lookupService.getIssueStatuses();
+        return ResponseEntity.ok(issueStatus);
+    }
 
-        List<LookupResponseDto> issueStatus = lookupService.getLookup(LookupType.ISSUE_STATUS).toList();
-        return new ResponseEntity<>(issueStatus, HttpStatus.OK);
+    @Operation(
+            summary = "All Issue Status Lookup",
+            description = "Get all lookups for issue status types including undefined"
+    )
+    @GetMapping("/issue-status/all")
+    ResponseEntity<List<LookupResponseDto>> getAllIssueStatusLookup() {
+        List<LookupResponseDto> issueStatus = lookupService.getAllIssueStatuses();
+        return ResponseEntity.ok(issueStatus);
     }
 
     @Operation(
             summary = "Task Priority Lookup",
-            description = "Get all lookups for task priority types"
+            description = "Get all lookups for task priority types (excluding undefined)"
     )
     @GetMapping("/task-priority")
     ResponseEntity<List<LookupResponseDto>> getTaskPriorityLookup() {
+        List<LookupResponseDto> taskPriority = lookupService.getTaskPriorities();
+        return ResponseEntity.ok(taskPriority);
+    }
 
-        List<LookupResponseDto> taskPriority = lookupService.getLookup(LookupType.TASK_PRIORITY).toList();
-        return new ResponseEntity<>(taskPriority, HttpStatus.OK);
+    @Operation(
+            summary = "All Task Priority Lookup",
+            description = "Get all lookups for task priority types including undefined"
+    )
+    @GetMapping("/task-priority/all")
+    ResponseEntity<List<LookupResponseDto>> getAllTaskPriorityLookup() {
+        List<LookupResponseDto> taskPriority = lookupService.getAllTaskPriorities();
+        return ResponseEntity.ok(taskPriority);
     }
 
     @Operation(
             summary = "Task Status Lookup",
-            description = "Get all lookups for task status types"
+            description = "Get all lookups for task status types (excluding undefined)"
     )
     @GetMapping("/task-status")
     ResponseEntity<List<LookupResponseDto>> getTaskStatusLookup() {
+        List<LookupResponseDto> taskStatus = lookupService.getTaskStatuses();
+        return ResponseEntity.ok(taskStatus);
+    }
 
-        List<LookupResponseDto> taskStatus = lookupService.getLookup(LookupType.TASK_STATUS).toList();
-        return new ResponseEntity<>(taskStatus, HttpStatus.OK);
+    @Operation(
+            summary = "All Task Status Lookup",
+            description = "Get all lookups for task status types including undefined"
+    )
+    @GetMapping("/task-status/all")
+    ResponseEntity<List<LookupResponseDto>> getAllTaskStatusLookup() {
+        List<LookupResponseDto> taskStatus = lookupService.getAllTaskStatuses();
+        return ResponseEntity.ok(taskStatus);
     }
 }

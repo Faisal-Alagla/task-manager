@@ -1,9 +1,9 @@
 package com.faisal.taskmanager.common.lookups;
 
-import com.faisal.taskmanager.common.lookups.entities.IssueCriticalityLk;
-import com.faisal.taskmanager.common.lookups.entities.IssueStatusLk;
-import com.faisal.taskmanager.common.lookups.entities.TaskPriorityLk;
-import com.faisal.taskmanager.common.lookups.entities.TaskStatusLk;
+import com.faisal.taskmanager.common.lookups.domain.IssueCriticalityLookupCollection;
+import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
+import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
+import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -13,8 +13,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -23,61 +21,80 @@ public class LookupService {
 
     private final LookupRepository lookupRepository;
 
-    private List<IssueCriticalityLk> issueCriticalityLookupList = List.of();
-    private List<IssueStatusLk> issueStatusLookupList = List.of();
-    private List<TaskPriorityLk> taskPriorityLookupList = List.of();
-    private List<TaskStatusLk> taskStatusLookupList = List.of();
+    private IssueCriticalityLookupCollection issueCriticalities;
+    private IssueStatusLookupCollection issueStatuses;
+    private TaskPriorityLookupCollection taskPriorities;
+    private TaskStatusLookupCollection taskStatuses;
 
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeLookups() {
-        log.info("filling lookup lists...");
+        log.info("Initializing lookup collections...");
 
-        issueCriticalityLookupList = lookupRepository.getIssueCriticalityLookup();
-        issueStatusLookupList = lookupRepository.getIssueStatusLookup();
-        taskPriorityLookupList = lookupRepository.getTaskPriorityLookup();
-        taskStatusLookupList = lookupRepository.getTaskStatusLookup();
+        issueCriticalities = new IssueCriticalityLookupCollection(
+                lookupRepository.getIssueCriticalityLookup()
+        );
+
+        issueStatuses = new IssueStatusLookupCollection(
+                lookupRepository.getIssueStatusLookup()
+        );
+
+        taskPriorities = new TaskPriorityLookupCollection(
+                lookupRepository.getTaskPriorityLookup()
+        );
+
+        taskStatuses = new TaskStatusLookupCollection(
+                lookupRepository.getTaskStatusLookup()
+        );
     }
 
-    Stream<LookupResponseDto> getLookup(LookupType type) {
-
-        switch (type) {
-            case ISSUE_CRITICALITY -> {
-                return issueCriticalityLookupList.stream().map(LookupResponseDto::fromEntity);
-            }
-            case ISSUE_STATUS -> {
-                return issueStatusLookupList.stream().map(LookupResponseDto::fromEntity);
-            }
-            case TASK_PRIORITY -> {
-                return taskPriorityLookupList.stream().map(LookupResponseDto::fromEntity);
-            }
-            case TASK_STATUS -> {
-                return taskStatusLookupList.stream().map(LookupResponseDto::fromEntity);
-            }
-            default -> {
-                log.error("no values for the given lookup type: {}", type.name());
-                return null;
-            }
-        }
-
+    public List<LookupResponseDto> getIssueCriticalities() {
+        return issueCriticalities.getFilteredDtos();
     }
 
-    public Optional<LookupResponseDto> findLookupById(LookupType type, Integer id) {
-        return getLookup(type)
-                .filter(item -> item.getId().equals(id))
-                .findFirst();
+    public List<LookupResponseDto> getAllIssueCriticalities() {
+        return issueCriticalities.toDtoList();
     }
 
-    public Optional<LookupResponseDto> findLookupByName(LookupType type, String name) {
-        return getLookup(type)
-                .filter(item -> item.getName().equals(name))
-                .findFirst();
+    public List<LookupResponseDto> getIssueStatuses() {
+        return issueStatuses.getFilteredDtos();
     }
 
-    public List<LookupResponseDto> findLookupByNames(LookupType type, List<String> names) {
-        return getLookup(type)
-                .filter(item -> names.contains(item.getName()))
-                .toList();
+    public List<LookupResponseDto> getAllIssueStatuses() {
+        return issueStatuses.toDtoList();
     }
 
+    public List<LookupResponseDto> getTaskPriorities() {
+        return taskPriorities.getFilteredDtos();
+    }
+
+    public List<LookupResponseDto> getAllTaskPriorities() {
+        return taskPriorities.toDtoList();
+    }
+
+    public List<LookupResponseDto> getTaskStatuses() {
+        return taskStatuses.getFilteredDtos();
+    }
+
+    public List<LookupResponseDto> getAllTaskStatuses() {
+        return taskStatuses.toDtoList();
+    }
+
+    // ========== Public API for Other Services ==========
+
+    public IssueCriticalityLookupCollection getIssueCriticalityCollection() {
+        return issueCriticalities;
+    }
+
+    public IssueStatusLookupCollection getIssueStatusCollection() {
+        return issueStatuses;
+    }
+
+    public TaskPriorityLookupCollection getTaskPriorityCollection() {
+        return taskPriorities;
+    }
+
+    public TaskStatusLookupCollection getTaskStatusCollection() {
+        return taskStatuses;
+    }
 }

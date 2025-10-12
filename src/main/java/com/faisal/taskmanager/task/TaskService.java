@@ -2,9 +2,10 @@ package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.ResourceException;
-import com.faisal.taskmanager.common.lookups.LookupResponseDto;
 import com.faisal.taskmanager.common.lookups.LookupService;
-import com.faisal.taskmanager.common.lookups.LookupType;
+import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
+import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
+import com.faisal.taskmanager.common.lookups.enums.TaskStatusEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
+        validateTaskLookups(taskCreationDto.getStatusId(), taskCreationDto.getPriorityId());
+
         Task createdTask = taskRepository.saveWithClosure(
                 TaskMapper.mapToTask(taskCreationDto),
                 taskCreationDto.getParentTaskId()
@@ -53,19 +56,14 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findByIdAndIsActiveTrue(taskId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
 
+        validateTaskLookups(taskUpdateDto.getStatusId(), taskUpdateDto.getPriorityId());
+
         Integer oldStatus = task.getStatusId();
         Integer newStatus = taskUpdateDto.getStatusId();
         boolean isStatusChanged = !Objects.equals(oldStatus, newStatus);
 
         if (isStatusChanged) {
-            LookupResponseDto newStatusLookup = lookupService.findLookupById(LookupType.TASK_STATUS, newStatus)
-                    .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND));
-
-            String statusName = newStatusLookup.getName();
-
-            if ("completed".equals(statusName) || "cancelled".equals(statusName)) {
-                taskRepository.updateTaskAndDescendantsStatus(taskId, newStatus);
-            }
+            handleStatusChange(taskId, oldStatus, newStatus);
         }
 
         updateTaskData(task, taskUpdateDto);
@@ -89,6 +87,35 @@ public class TaskService implements ITaskService {
         return taskRepository.findByIdAndIsActiveTrue(taskId).isPresent();
     }
 
+    private void handleStatusChange(UUID taskId, Integer oldStatusId, Integer newStatusId) {
+        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
+
+        TaskStatusEnum newStatusEnum = statuses.toEnum(newStatusId);
+        if (newStatusEnum == null) {
+            throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
+        }
+
+        if (!canTransitionToStatus(oldStatusId, newStatusId)) {
+            throw new ResourceException(ErrorMessage.INVALID_STATUS_TRANSITION);
+        }
+
+        // If transitioning to terminal status, update descendants
+        if (statuses.isTerminal(newStatusId)) {
+            taskRepository.updateTaskAndDescendantsStatus(taskId, newStatusId);
+        }
+    }
+
+    private boolean canTransitionToStatus(Integer currentStatusId, Integer newStatusId) {
+        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
+
+        if (Objects.equals(currentStatusId, newStatusId)) {
+            return false;
+        }
+
+        // Can't transition from terminal status
+        return !statuses.isTerminal(currentStatusId);
+    }
+
     private void updateTaskData(Task task, TaskUpdateDto taskUpdateDto) {
         task.setUpdatedAt(LocalDateTime.now());
         task.setName(taskUpdateDto.getName());
@@ -98,4 +125,18 @@ public class TaskService implements ITaskService {
         task.setStatusId(taskUpdateDto.getStatusId());
         task.setPriorityId(taskUpdateDto.getPriorityId());
     }
+
+    private void validateTaskLookups(Integer statusId, Integer priorityId) {
+        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
+        TaskPriorityLookupCollection priorities = lookupService.getTaskPriorityCollection();
+
+        if (!statuses.containsId(statusId)) {
+            throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
+        }
+
+        if (!priorities.containsId(priorityId)) {
+            throw new ResourceException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
+        }
+    }
+
 }

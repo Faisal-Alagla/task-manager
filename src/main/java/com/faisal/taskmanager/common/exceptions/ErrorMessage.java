@@ -17,6 +17,7 @@ public enum ErrorMessage {
 
     //task
     TASK_NOT_FOUND(2_000, "Task not found"),
+    INVALID_STATUS_TRANSITION(2_001, "Invalid status transition"),
 
     //issue
     ISSUE_NOT_FOUND(2_100, "Issue not found"),

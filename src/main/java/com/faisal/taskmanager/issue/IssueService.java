@@ -2,9 +2,11 @@ package com.faisal.taskmanager.issue;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.ResourceException;
+import com.faisal.taskmanager.common.lookups.LookupService;
+import com.faisal.taskmanager.common.lookups.domain.IssueCriticalityLookupCollection;
+import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -14,9 +16,12 @@ import java.util.UUID;
 public class IssueService implements IIssueService {
 
     private final IssueRepository issueRepository;
+    private final LookupService lookupService;
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
+        validateIssueLookups(issueCreationDto.getCriticalityId(), issueCreationDto.getStatusId());
+
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
 
         return IssueMapper.mapToIssueResponseDto(createdIssue);
@@ -34,6 +39,8 @@ public class IssueService implements IIssueService {
     public IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId) {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
+
+        validateIssueLookups(issueUpdateDto.getCriticalityId(), issueUpdateDto.getStatusId());
 
         updateIssueData(issue, issueUpdateDto);
         Issue updatedIssue = issueRepository.save(issue);
@@ -60,6 +67,19 @@ public class IssueService implements IIssueService {
         issue.setDescription(issueUpdateDto.getDescription());
         issue.setStatusId(issueUpdateDto.getStatusId());
         issue.setCriticalityId(issueUpdateDto.getCriticalityId());
+    }
+
+    private void validateIssueLookups(Integer criticalityId, Integer statusId) {
+        IssueCriticalityLookupCollection criticalities = lookupService.getIssueCriticalityCollection();
+        IssueStatusLookupCollection statuses = lookupService.getIssueStatusCollection();
+
+        if (!criticalities.containsId(criticalityId)) {
+            throw new ResourceException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
+        }
+
+        if (!statuses.containsId(statusId)) {
+            throw new ResourceException(ErrorMessage.ISSUE_STATUS_NOT_FOUND);
+        }
     }
 
 }

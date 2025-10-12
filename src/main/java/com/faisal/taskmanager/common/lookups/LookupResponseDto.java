@@ -12,7 +12,7 @@ public class LookupResponseDto {
 
     private String name;
 
-    static LookupResponseDto fromEntity(BaseLookupResponseInterface item) {
+    public static LookupResponseDto fromEntity(BaseLookupResponseInterface item) {
         return new LookupResponseDto(
                 item.getId(),
                 item.getName()
