@@ -48,15 +48,6 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Filter using specification and return as DTOs
-     */
-    public List<LookupResponseDto> findByAsDto(LookupSpecification<T> spec) {
-        return findBy(spec).stream()
-                .map(LookupResponseDto::fromEntity)
-                .toList();
-    }
-
-    /**
      * Find first matching specification
      */
     public T findFirstBy(LookupSpecification<T> spec) {
@@ -67,47 +58,12 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Check if any item matches specification
-     */
-    public boolean anyMatch(LookupSpecification<T> spec) {
-        return items.stream().anyMatch(spec.toPredicate());
-    }
-
-    /**
-     * Check if all items match specification
-     */
-    public boolean allMatch(LookupSpecification<T> spec) {
-        return items.stream().allMatch(spec.toPredicate());
-    }
-
-    /**
      * Count items matching specification
      */
     public long countBy(LookupSpecification<T> spec) {
         return items.stream()
                 .filter(spec.toPredicate())
                 .count();
-    }
-
-    /**
-     * Override in subclasses to provide default filtering behavior
-     */
-    protected LookupSpecification<T> getDefaultSpecification() {
-        return () -> item -> true; // No filtering by default
-    }
-
-    /**
-     * Get filtered items (applies default filter defined in subclass)
-     */
-    public List<T> getFiltered() {
-        return findBy(getDefaultSpecification());
-    }
-
-    /**
-     * Get filtered items as DTOs
-     */
-    public List<LookupResponseDto> getFilteredDtos() {
-        return findByAsDto(getDefaultSpecification());
     }
 
     /**

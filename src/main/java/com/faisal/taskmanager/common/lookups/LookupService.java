@@ -48,40 +48,24 @@ public class LookupService {
         );
     }
 
+    // Controller endpoints
     public List<LookupResponseDto> getIssueCriticalities() {
-        return issueCriticalities.getFilteredDtos();
-    }
-
-    public List<LookupResponseDto> getAllIssueCriticalities() {
         return issueCriticalities.toDtoList();
     }
 
     public List<LookupResponseDto> getIssueStatuses() {
-        return issueStatuses.getFilteredDtos();
-    }
-
-    public List<LookupResponseDto> getAllIssueStatuses() {
         return issueStatuses.toDtoList();
     }
 
     public List<LookupResponseDto> getTaskPriorities() {
-        return taskPriorities.getFilteredDtos();
-    }
-
-    public List<LookupResponseDto> getAllTaskPriorities() {
         return taskPriorities.toDtoList();
     }
 
     public List<LookupResponseDto> getTaskStatuses() {
-        return taskStatuses.getFilteredDtos();
-    }
-
-    public List<LookupResponseDto> getAllTaskStatuses() {
         return taskStatuses.toDtoList();
     }
 
-    // ========== Public API for Other Services ==========
-
+    // Public API for other services
     public IssueCriticalityLookupCollection getIssueCriticalityCollection() {
         return issueCriticalities;
     }

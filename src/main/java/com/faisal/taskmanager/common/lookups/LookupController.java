@@ -26,7 +26,7 @@ public class LookupController {
 
     @Operation(
             summary = "Issue Criticality Lookup",
-            description = "Get all lookups for issue criticality types (excluding undefined)"
+            description = "Get all lookups for issue criticality types"
     )
     @GetMapping("/issue-criticality")
     ResponseEntity<List<LookupResponseDto>> getIssueCriticalityLookup() {
@@ -35,18 +35,8 @@ public class LookupController {
     }
 
     @Operation(
-            summary = "All Issue Criticality Lookup",
-            description = "Get all lookups for issue criticality types including undefined"
-    )
-    @GetMapping("/issue-criticality/all")
-    ResponseEntity<List<LookupResponseDto>> getAllIssueCriticalityLookup() {
-        List<LookupResponseDto> issueCriticality = lookupService.getAllIssueCriticalities();
-        return ResponseEntity.ok(issueCriticality);
-    }
-
-    @Operation(
             summary = "Issue Status Lookup",
-            description = "Get all lookups for issue status types (excluding undefined)"
+            description = "Get all lookups for issue status types"
     )
     @GetMapping("/issue-status")
     ResponseEntity<List<LookupResponseDto>> getIssueStatusLookup() {
@@ -55,18 +45,8 @@ public class LookupController {
     }
 
     @Operation(
-            summary = "All Issue Status Lookup",
-            description = "Get all lookups for issue status types including undefined"
-    )
-    @GetMapping("/issue-status/all")
-    ResponseEntity<List<LookupResponseDto>> getAllIssueStatusLookup() {
-        List<LookupResponseDto> issueStatus = lookupService.getAllIssueStatuses();
-        return ResponseEntity.ok(issueStatus);
-    }
-
-    @Operation(
             summary = "Task Priority Lookup",
-            description = "Get all lookups for task priority types (excluding undefined)"
+            description = "Get all lookups for task priority types"
     )
     @GetMapping("/task-priority")
     ResponseEntity<List<LookupResponseDto>> getTaskPriorityLookup() {
@@ -75,32 +55,12 @@ public class LookupController {
     }
 
     @Operation(
-            summary = "All Task Priority Lookup",
-            description = "Get all lookups for task priority types including undefined"
-    )
-    @GetMapping("/task-priority/all")
-    ResponseEntity<List<LookupResponseDto>> getAllTaskPriorityLookup() {
-        List<LookupResponseDto> taskPriority = lookupService.getAllTaskPriorities();
-        return ResponseEntity.ok(taskPriority);
-    }
-
-    @Operation(
             summary = "Task Status Lookup",
-            description = "Get all lookups for task status types (excluding undefined)"
+            description = "Get all lookups for task status types"
     )
     @GetMapping("/task-status")
     ResponseEntity<List<LookupResponseDto>> getTaskStatusLookup() {
         List<LookupResponseDto> taskStatus = lookupService.getTaskStatuses();
-        return ResponseEntity.ok(taskStatus);
-    }
-
-    @Operation(
-            summary = "All Task Status Lookup",
-            description = "Get all lookups for task status types including undefined"
-    )
-    @GetMapping("/task-status/all")
-    ResponseEntity<List<LookupResponseDto>> getAllTaskStatusLookup() {
-        List<LookupResponseDto> taskStatus = lookupService.getAllTaskStatuses();
         return ResponseEntity.ok(taskStatus);
     }
 }
