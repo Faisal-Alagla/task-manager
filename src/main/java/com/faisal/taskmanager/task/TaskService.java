@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -22,6 +23,16 @@ public class TaskService implements ITaskService {
 
     private final TaskRepository taskRepository;
     private final LookupService lookupService;
+
+    // Cached lookup collections
+    private TaskStatusLookupCollection statuses;
+    private TaskPriorityLookupCollection priorities;
+
+    @PostConstruct
+    private void init() {
+        this.statuses = lookupService.getTaskStatusCollection();
+        this.priorities = lookupService.getTaskPriorityCollection();
+    }
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
@@ -88,8 +99,6 @@ public class TaskService implements ITaskService {
     }
 
     private void handleStatusChange(UUID taskId, Integer oldStatusId, Integer newStatusId) {
-        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
-
         TaskStatusEnum newStatusEnum = statuses.toEnum(newStatusId);
         if (newStatusEnum == null) {
             throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
@@ -106,8 +115,6 @@ public class TaskService implements ITaskService {
     }
 
     private boolean canTransitionToStatus(Integer currentStatusId, Integer newStatusId) {
-        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
-
         if (Objects.equals(currentStatusId, newStatusId)) {
             return false;
         }
@@ -127,9 +134,6 @@ public class TaskService implements ITaskService {
     }
 
     private void validateTaskLookups(Integer statusId, Integer priorityId) {
-        TaskStatusLookupCollection statuses = lookupService.getTaskStatusCollection();
-        TaskPriorityLookupCollection priorities = lookupService.getTaskPriorityCollection();
-
         if (!statuses.containsId(statusId)) {
             throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
         }
@@ -138,5 +142,4 @@ public class TaskService implements ITaskService {
             throw new ResourceException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
         }
     }
-
 }

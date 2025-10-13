@@ -8,6 +8,7 @@ import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,6 +18,16 @@ public class IssueService implements IIssueService {
 
     private final IssueRepository issueRepository;
     private final LookupService lookupService;
+
+    // Cached lookup collections
+    private IssueCriticalityLookupCollection criticalities;
+    private IssueStatusLookupCollection statuses;
+
+    @PostConstruct
+    private void init() {
+        this.criticalities = lookupService.getIssueCriticalityCollection();
+        this.statuses = lookupService.getIssueStatusCollection();
+    }
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
@@ -70,9 +81,6 @@ public class IssueService implements IIssueService {
     }
 
     private void validateIssueLookups(Integer criticalityId, Integer statusId) {
-        IssueCriticalityLookupCollection criticalities = lookupService.getIssueCriticalityCollection();
-        IssueStatusLookupCollection statuses = lookupService.getIssueStatusCollection();
-
         if (!criticalities.containsId(criticalityId)) {
             throw new ResourceException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
         }
