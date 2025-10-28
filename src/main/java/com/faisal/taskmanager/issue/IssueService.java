@@ -5,12 +5,18 @@ import com.faisal.taskmanager.common.exceptions.ResourceException;
 import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.common.lookups.domain.IssueCriticalityLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
+import com.faisal.taskmanager.common.lookups.entities.IssueCriticalityLk;
+import com.faisal.taskmanager.common.lookups.entities.IssueStatusLk;
+import com.faisal.taskmanager.issue.dto.IssueCreationDto;
+import com.faisal.taskmanager.issue.dto.IssueResponseDto;
+import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +25,19 @@ public class IssueService implements IIssueService {
     private final IssueRepository issueRepository;
     private final LookupService lookupService;
 
-    // Cached lookup collections
+    // lookup collections
     private IssueCriticalityLookupCollection criticalities;
     private IssueStatusLookupCollection statuses;
+
+    // lookup context
+    private IssueLookupContext issueLookupContext;
 
     @PostConstruct
     private void init() {
         this.criticalities = lookupService.getIssueCriticalityCollection();
         this.statuses = lookupService.getIssueStatusCollection();
+
+        this.issueLookupContext = buildLookupContext();
     }
 
     @Override
@@ -81,13 +92,32 @@ public class IssueService implements IIssueService {
     }
 
     private void validateIssueLookups(Integer criticalityId, Integer statusId) {
-        if (!criticalities.containsId(criticalityId)) {
+        if (!issueLookupContext.getIssueCriticalityIds().contains(criticalityId)) {
             throw new ResourceException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
         }
 
-        if (!statuses.containsId(statusId)) {
+        if (!issueLookupContext.getIssueStatusIds().contains(statusId)) {
             throw new ResourceException(ErrorMessage.ISSUE_STATUS_NOT_FOUND);
         }
+    }
+
+    private IssueLookupContext buildLookupContext() {
+        return IssueLookupContext.builder()
+                // Issue status IDs
+                .issueStatusIds(
+                        statuses.stream()
+                                .map(IssueStatusLk::getId)
+                                .collect(Collectors.toSet())
+                )
+
+                // Issue criticality IDs
+                .issueCriticalityIds(
+                        criticalities.stream()
+                                .map(IssueCriticalityLk::getId)
+                                .collect(Collectors.toSet())
+                )
+
+                .build();
     }
 
 }

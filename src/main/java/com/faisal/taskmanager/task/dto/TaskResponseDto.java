@@ -1,8 +1,8 @@
-package com.faisal.taskmanager.task;
+package com.faisal.taskmanager.task.dto;
 
 import com.faisal.taskmanager.utils.Interfaces.BaseResponseDtoInterface;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-@Builder
+@AllArgsConstructor
 @Schema(
         name = "TaskResponse",
         description = "Schema to hold Task information as a response"

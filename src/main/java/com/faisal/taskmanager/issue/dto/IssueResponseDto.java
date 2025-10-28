@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.issue;
+package com.faisal.taskmanager.issue.dto;
 
 import com.faisal.taskmanager.utils.Interfaces.BaseResponseDtoInterface;
 import io.swagger.v3.oas.annotations.media.Schema;

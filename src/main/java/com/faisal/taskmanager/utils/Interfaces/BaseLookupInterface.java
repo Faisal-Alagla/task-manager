@@ -1,6 +1,6 @@
 package com.faisal.taskmanager.utils.Interfaces;
 
-public interface BaseLookupResponseInterface {
+public interface BaseLookupInterface {
 
     Integer id = 0;
 

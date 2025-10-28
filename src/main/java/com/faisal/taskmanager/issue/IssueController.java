@@ -1,5 +1,8 @@
 package com.faisal.taskmanager.issue;
 
+import com.faisal.taskmanager.issue.dto.IssueCreationDto;
+import com.faisal.taskmanager.issue.dto.IssueResponseDto;
+import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
 import com.faisal.taskmanager.utils.constants.BaseRoutingConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

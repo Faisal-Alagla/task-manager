@@ -4,10 +4,9 @@ import com.faisal.taskmanager.common.lookups.domain.IssueCriticalityLookupCollec
 import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class LookupService {
     private TaskStatusLookupCollection taskStatuses;
 
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    @EventListener(ApplicationReadyEvent.class)
+    @PostConstruct
     protected void initializeLookups() {
         log.info("Initializing lookup collections...");
 

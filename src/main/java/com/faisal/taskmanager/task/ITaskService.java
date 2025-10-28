@@ -1,5 +1,8 @@
 package com.faisal.taskmanager.task;
 
+import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskResponseDto;
+import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

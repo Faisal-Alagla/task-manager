@@ -1,6 +1,6 @@
 package com.faisal.taskmanager.utils.baseclasses;
 
-import com.faisal.taskmanager.utils.Interfaces.BaseLookupResponseInterface;
+import com.faisal.taskmanager.utils.Interfaces.BaseLookupInterface;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
-public class BaseLookupEntity implements BaseLookupResponseInterface {
+public class BaseLookupEntity implements BaseLookupInterface {
 
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

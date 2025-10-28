@@ -1,5 +1,7 @@
 package com.faisal.taskmanager.task;
 
+import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import jakarta.persistence.Tuple;
 
 import java.sql.Timestamp;

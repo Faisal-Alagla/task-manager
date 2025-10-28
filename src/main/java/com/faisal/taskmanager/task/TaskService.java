@@ -5,7 +5,11 @@ import com.faisal.taskmanager.common.exceptions.ResourceException;
 import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
-import com.faisal.taskmanager.common.lookups.enums.TaskStatusEnum;
+import com.faisal.taskmanager.common.lookups.entities.TaskPriorityLk;
+import com.faisal.taskmanager.common.lookups.entities.TaskStatusLk;
+import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskResponseDto;
+import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +20,7 @@ import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,14 +29,19 @@ public class TaskService implements ITaskService {
     private final TaskRepository taskRepository;
     private final LookupService lookupService;
 
-    // Cached lookup collections
+    // lookup collections
     private TaskStatusLookupCollection statuses;
     private TaskPriorityLookupCollection priorities;
+
+    // lookup context
+    private TaskLookupContext taskLookupContext;
 
     @PostConstruct
     private void init() {
         this.statuses = lookupService.getTaskStatusCollection();
         this.priorities = lookupService.getTaskPriorityCollection();
+
+        this.taskLookupContext = buildLookupContext();
     }
 
     @Override
@@ -99,17 +109,12 @@ public class TaskService implements ITaskService {
     }
 
     private void handleStatusChange(UUID taskId, Integer oldStatusId, Integer newStatusId) {
-        TaskStatusEnum newStatusEnum = statuses.toEnum(newStatusId);
-        if (newStatusEnum == null) {
-            throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
-        }
-
         if (!canTransitionToStatus(oldStatusId, newStatusId)) {
             throw new ResourceException(ErrorMessage.INVALID_STATUS_TRANSITION);
         }
 
         // If transitioning to terminal status, update descendants
-        if (statuses.isTerminal(newStatusId)) {
+        if (taskLookupContext.getTerminalStatusIds().contains(newStatusId)) {
             taskRepository.updateTaskAndDescendantsStatus(taskId, newStatusId);
         }
     }
@@ -120,7 +125,7 @@ public class TaskService implements ITaskService {
         }
 
         // Can't transition from terminal status
-        return !statuses.isTerminal(currentStatusId);
+        return !taskLookupContext.getTerminalStatusIds().contains(currentStatusId);
     }
 
     private void updateTaskData(Task task, TaskUpdateDto taskUpdateDto) {
@@ -134,12 +139,36 @@ public class TaskService implements ITaskService {
     }
 
     private void validateTaskLookups(Integer statusId, Integer priorityId) {
-        if (!statuses.containsId(statusId)) {
+        if (!taskLookupContext.getTaskStatusIds().contains(statusId)) {
             throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
         }
 
-        if (!priorities.containsId(priorityId)) {
+        if (!taskLookupContext.getTaskPriorityIds().contains(priorityId)) {
             throw new ResourceException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
         }
+    }
+
+    private TaskLookupContext buildLookupContext() {
+        return TaskLookupContext.builder()
+                // Task status IDs
+                .taskStatusIds(
+                        statuses.stream()
+                                .map(TaskStatusLk::getId)
+                                .collect(Collectors.toSet())
+                )
+                .terminalStatusIds(
+                        statuses.getTerminalStatuses().stream()
+                                .map(TaskStatusLk::getId)
+                                .collect(Collectors.toSet())
+                )
+
+                // Task priority IDs
+                .taskStatusIds(
+                        priorities.stream()
+                                .map(TaskPriorityLk::getId)
+                                .collect(Collectors.toSet())
+                )
+
+                .build();
     }
 }

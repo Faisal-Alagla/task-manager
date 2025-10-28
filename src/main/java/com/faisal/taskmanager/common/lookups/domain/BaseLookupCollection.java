@@ -2,12 +2,12 @@ package com.faisal.taskmanager.common.lookups.domain;
 
 import com.faisal.taskmanager.common.lookups.LookupResponseDto;
 import com.faisal.taskmanager.common.lookups.specifications.LookupSpecification;
-import com.faisal.taskmanager.utils.Interfaces.BaseLookupResponseInterface;
+import com.faisal.taskmanager.utils.Interfaces.BaseLookupInterface;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface> {
+public abstract class BaseLookupCollection<T extends BaseLookupInterface> {
 
     protected final List<T> items;
 
@@ -16,21 +16,46 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Get all items as entities (for business logic in services)
+     * Filters items using a specification.
+     * <p>
+     * This is a protected helper method intended for use within subclass public methods.
+     * Consider using this to build well-named, domain-specific public methods.
+     *
+     * @param spec the specification to filter by
+     * @return list of entities matching the specification
+     */
+    protected List<T> filter(LookupSpecification<T> spec) {
+        return items.stream()
+                .filter(spec.toPredicate())
+                .toList();
+    }
+
+    /**
+     * Returns all lookup items as entities.
+     *
+     * @return immutable list of all lookup entities
      */
     public List<T> getAll() {
         return items;
     }
 
     /**
-     * Get all items as stream (for filtering/mapping)
+     * Returns items as a stream for advanced filtering and mapping operations.
+     * <p>
+     * Use this when you need to chain multiple stream operations beyond simple filtering.
+     *
+     * @return stream of lookup entities
      */
     public Stream<T> stream() {
         return items.stream();
     }
 
     /**
-     * Map to DTOs for controller responses
+     * Transforms all items to DTO format for controller responses.
+     * <p>
+     * This method is typically called by service layer methods that are exposed to controllers.
+     *
+     * @return list of DTOs containing only id and name
      */
     public List<LookupResponseDto> toDtoList() {
         return items.stream()
@@ -39,7 +64,12 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Filter using a single specification
+     * Finds all items matching a specification.
+     * <p>
+     * Public version of {@code filter()} for external specification-based filtering.
+     *
+     * @param spec the specification to filter by
+     * @return list of entities matching the specification
      */
     public List<T> findBy(LookupSpecification<T> spec) {
         return items.stream()
@@ -48,7 +78,10 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Find first matching specification
+     * Finds the first item matching a specification.
+     *
+     * @param spec the specification to match
+     * @return first matching entity, or {@code null} if no match found
      */
     public T findFirstBy(LookupSpecification<T> spec) {
         return items.stream()
@@ -58,16 +91,10 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
     }
 
     /**
-     * Count items matching specification
-     */
-    public long countBy(LookupSpecification<T> spec) {
-        return items.stream()
-                .filter(spec.toPredicate())
-                .count();
-    }
-
-    /**
-     * Find by ID - returns entity for business logic
+     * Finds a lookup entity by its ID.
+     *
+     * @param id the lookup ID to search for
+     * @return the matching entity, or {@code null} if not found
      */
     public T findById(Integer id) {
         return items.stream()
@@ -76,34 +103,4 @@ public abstract class BaseLookupCollection<T extends BaseLookupResponseInterface
                 .orElse(null);
     }
 
-    /**
-     * Find by name - returns entity for business logic
-     */
-    public T findByName(String name) {
-        return items.stream()
-                .filter(item -> item.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElse(null);
-    }
-
-    /**
-     * Get count
-     */
-    public int count() {
-        return items.size();
-    }
-
-    /**
-     * Check if contains item by ID
-     */
-    public boolean containsId(Integer id) {
-        return items.stream().anyMatch(item -> item.getId().equals(id));
-    }
-
-    /**
-     * Check if contains item by name
-     */
-    public boolean containsName(String name) {
-        return items.stream().anyMatch(item -> item.getName().equalsIgnoreCase(name));
-    }
 }

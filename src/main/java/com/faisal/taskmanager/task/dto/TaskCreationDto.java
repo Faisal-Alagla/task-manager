@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.task;
+package com.faisal.taskmanager.task.dto;
 
 import com.faisal.taskmanager.utils.validations.TaskExistsValidation;
 import io.swagger.v3.oas.annotations.media.Schema;

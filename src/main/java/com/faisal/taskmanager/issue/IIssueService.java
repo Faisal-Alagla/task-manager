@@ -1,5 +1,9 @@
 package com.faisal.taskmanager.issue;
 
+import com.faisal.taskmanager.issue.dto.IssueCreationDto;
+import com.faisal.taskmanager.issue.dto.IssueResponseDto;
+import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
+
 import java.util.UUID;
 
 public interface IIssueService {

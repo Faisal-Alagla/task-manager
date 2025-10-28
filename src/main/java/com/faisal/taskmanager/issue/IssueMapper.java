@@ -1,6 +1,9 @@
 package com.faisal.taskmanager.issue;
 
 
+import com.faisal.taskmanager.issue.dto.IssueCreationDto;
+import com.faisal.taskmanager.issue.dto.IssueResponseDto;
+
 public class IssueMapper {
 
     /**
