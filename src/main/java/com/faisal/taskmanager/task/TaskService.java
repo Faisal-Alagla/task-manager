@@ -1,7 +1,7 @@
 package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
-import com.faisal.taskmanager.common.exceptions.ResourceException;
+import com.faisal.taskmanager.common.exceptions.HandledException;
 import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
@@ -10,13 +10,13 @@ import com.faisal.taskmanager.common.lookups.entities.TaskStatusLk;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -55,14 +55,14 @@ public class TaskService implements ITaskService {
 
         return taskRepository.findTaskByIdWithRelations(createdTask.getId())
                 .map(TaskMapper::mapToTaskResponseFromTuple)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
     }
 
     @Override
     public TaskResponseDto getTask(UUID taskId) {
         return taskRepository.findTaskByIdWithRelations(taskId)
                 .map(TaskMapper::mapToTaskResponseFromTuple)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class TaskService implements ITaskService {
     @Transactional
     public TaskResponseDto updateTask(TaskUpdateDto taskUpdateDto, UUID taskId) {
         Task task = taskRepository.findByIdAndIsActiveTrue(taskId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
 
         validateTaskLookups(taskUpdateDto.getStatusId(), taskUpdateDto.getPriorityId());
 
@@ -92,13 +92,13 @@ public class TaskService implements ITaskService {
 
         return taskRepository.findTaskByIdWithRelations(taskId)
                 .map(TaskMapper::mapToTaskResponseFromTuple)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.TASK_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
     }
 
     @Override
     public void deleteTask(UUID taskId) {
         if (!taskExists(taskId)) {
-            throw new ResourceException(ErrorMessage.TASK_NOT_FOUND);
+            throw new HandledException(ErrorMessage.TASK_NOT_FOUND);
         }
 
         taskRepository.deactivateTaskAndDescendants(taskId);
@@ -110,7 +110,7 @@ public class TaskService implements ITaskService {
 
     private void handleStatusChange(UUID taskId, Integer oldStatusId, Integer newStatusId) {
         if (!canTransitionToStatus(oldStatusId, newStatusId)) {
-            throw new ResourceException(ErrorMessage.INVALID_STATUS_TRANSITION);
+            throw new HandledException(ErrorMessage.INVALID_STATUS_TRANSITION);
         }
 
         // If transitioning to terminal status, update descendants
@@ -140,11 +140,11 @@ public class TaskService implements ITaskService {
 
     private void validateTaskLookups(Integer statusId, Integer priorityId) {
         if (!taskLookupContext.getTaskStatusIds().contains(statusId)) {
-            throw new ResourceException(ErrorMessage.TASK_STATUS_NOT_FOUND);
+            throw new HandledException(ErrorMessage.TASK_STATUS_NOT_FOUND);
         }
 
         if (!taskLookupContext.getTaskPriorityIds().contains(priorityId)) {
-            throw new ResourceException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
+            throw new HandledException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
         }
     }
 

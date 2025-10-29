@@ -1,7 +1,7 @@
 package com.faisal.taskmanager.issue;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
-import com.faisal.taskmanager.common.exceptions.ResourceException;
+import com.faisal.taskmanager.common.exceptions.HandledException;
 import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.common.lookups.domain.IssueCriticalityLookupCollection;
 import com.faisal.taskmanager.common.lookups.domain.IssueStatusLookupCollection;
@@ -52,7 +52,7 @@ public class IssueService implements IIssueService {
     @Override
     public IssueResponseDto getIssue(UUID issueId) {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.ISSUE_NOT_FOUND));
 
         return IssueMapper.mapToIssueResponseDto(issue);
     }
@@ -60,7 +60,7 @@ public class IssueService implements IIssueService {
     @Override
     public IssueResponseDto updateIssue(IssueUpdateDto issueUpdateDto, UUID issueId) {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
-                .orElseThrow(() -> new ResourceException(ErrorMessage.ISSUE_NOT_FOUND));
+                .orElseThrow(() -> new HandledException(ErrorMessage.ISSUE_NOT_FOUND));
 
         validateIssueLookups(issueUpdateDto.getCriticalityId(), issueUpdateDto.getStatusId());
 
@@ -73,7 +73,7 @@ public class IssueService implements IIssueService {
     @Override
     public void deleteIssue(UUID issueId) {
         if (!issueExists(issueId)) {
-            throw new ResourceException(ErrorMessage.ISSUE_NOT_FOUND);
+            throw new HandledException(ErrorMessage.ISSUE_NOT_FOUND);
         }
 
         issueRepository.deactivateIssue(issueId);
@@ -93,11 +93,11 @@ public class IssueService implements IIssueService {
 
     private void validateIssueLookups(Integer criticalityId, Integer statusId) {
         if (!issueLookupContext.getIssueCriticalityIds().contains(criticalityId)) {
-            throw new ResourceException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
+            throw new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
         }
 
         if (!issueLookupContext.getIssueStatusIds().contains(statusId)) {
-            throw new ResourceException(ErrorMessage.ISSUE_STATUS_NOT_FOUND);
+            throw new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND);
         }
     }
 

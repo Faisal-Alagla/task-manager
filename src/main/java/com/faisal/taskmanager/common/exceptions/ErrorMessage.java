@@ -1,43 +1,72 @@
 package com.faisal.taskmanager.common.exceptions;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
+/**
+ * Enumeration of all application-specific error messages.
+ *
+ * <p>Each error contains an internal code, HTTP status, and user-friendly message.
+ * Internal codes are organized by category:</p>
+ * <ul>
+ *   <li>1xxx - General errors</li>
+ *   <li>2xxx - Validation errors</li>
+ *   <li>3xxx - Data integrity errors</li>
+ *   <li>4xxx - Business logic errors</li>
+ *   <li>5xxx - Task domain errors</li>
+ *   <li>6xxx - Issue domain errors</li>
+ * </ul>
+ *
+ * <p><b>Usage Example:</b></p>
+ * <pre>{@code
+ * throw new HandledException(ErrorMessage.TASK_NOT_FOUND);
+ * }</pre>
+ *
+ * @see HandledException
+ * @see ErrorResponse
+ * @author Faisal
+ */
 @Getter
 public enum ErrorMessage {
 
-    //validation
-    CONSTRAINT_VIOLATED_EXCEPTION(1_000, "Constraint violated exception"),
-    INVALID_REQUEST_PAYLOAD(1_001, "The request content is not valid and could not be deserialized."),
-    INVALID_REQUEST_ATTRIBUTES(1_002, "Invalid request attributes"),
-    INVALID_PATH(1_003, "Invalid path value"),
-    MISSING_REQUEST_PARAMETER(1_004, "Required parameter is missing"),
-    UNSUPPORTED_REQUEST_METHOD(1_005, "Request method is not supported"),
-    INVALID_API_USAGE(1_007, "Invalid API usage"),
-    DATA_INTEGRITY_VIOLATION_EXCEPTION(1_007, "Data integrity violation exception"),
+    // General errors (1xxx)
+    INTERNAL_SERVER_ERROR(1000, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
+    RESOURCE_NOT_FOUND_ERROR(1001, HttpStatus.NOT_FOUND, "Resource not found"),
 
-    //task
-    TASK_NOT_FOUND(2_000, "Task not found"),
-    INVALID_STATUS_TRANSITION(2_001, "Invalid status transition"),
+    // Validation errors (2xxx)
+    CONSTRAINT_VIOLATED_ERROR(2000, HttpStatus.BAD_REQUEST, "Constraint violated error"),
+    INVALID_REQUEST_PAYLOAD(2001, HttpStatus.BAD_REQUEST, "The request content is not valid and could not be deserialized"),
+    INVALID_REQUEST_ATTRIBUTES(2002, HttpStatus.BAD_REQUEST, "Invalid request attributes"),
+    INVALID_PATH(2003, HttpStatus.BAD_REQUEST, "Invalid path value"),
+    MISSING_REQUEST_PARAMETER(2004, HttpStatus.BAD_REQUEST, "Required parameter is missing"),
+    METHOD_ARGUMENT_MISMATCH_ERROR(2005, HttpStatus.BAD_REQUEST, "Method argument type mismatch"),
+    HTTP_MESSAGE_NOT_READABLE_ERROR(2006, HttpStatus.BAD_REQUEST, "HTTP message not readable"),
+    UNSUPPORTED_REQUEST_METHOD(2007, HttpStatus.METHOD_NOT_ALLOWED, "Request method is not supported"),
+    INVALID_API_USAGE(2008, HttpStatus.BAD_REQUEST, "Invalid API usage"),
 
-    //issue
-    ISSUE_NOT_FOUND(2_100, "Issue not found"),
+    // Data integrity errors (3xxx)
+    DATA_INTEGRITY_VIOLATION_ERROR(3000, HttpStatus.CONFLICT, "Data integrity violation error"),
 
-    //lookup,
-    ISSUE_CRITICALITY_NOT_FOUND(3_000, "Issue criticality not found"),
-    ISSUE_STATUS_NOT_FOUND(3_001, "Issue status not found"),
-    TASK_PRIORITY_NOT_FOUND(3_001, "Task priority not found"),
-    TASK_STATUS_NOT_FOUND(3_001, "Task status not found"),
+    // Business logic errors (4xxx)
+    INVALID_STATUS_TRANSITION(4000, HttpStatus.BAD_REQUEST, "Invalid status transition"),
 
-    //activity
+    // Task domain errors (5xxx)
+    TASK_NOT_FOUND(5000, HttpStatus.NOT_FOUND, "Task not found"),
+    TASK_PRIORITY_NOT_FOUND(5001, HttpStatus.NOT_FOUND, "Task priority not found"),
+    TASK_STATUS_NOT_FOUND(5002, HttpStatus.NOT_FOUND, "Task status not found"),
 
-    //general
-    INTERNAL_SERVER_ERROR(5_000, "Internal Server Error");
+    // Issue domain errors (6xxx)
+    ISSUE_NOT_FOUND(6000, HttpStatus.NOT_FOUND, "Issue not found"),
+    ISSUE_CRITICALITY_NOT_FOUND(6001, HttpStatus.NOT_FOUND, "Issue criticality not found"),
+    ISSUE_STATUS_NOT_FOUND(6002, HttpStatus.NOT_FOUND, "Issue status not found");
 
-    private final Integer internalCode;
+    private final int internalCode;
+    private final HttpStatus httpStatus;
     private final String message;
 
-    ErrorMessage(Integer internalCode, String message) {
+    ErrorMessage(int internalCode, HttpStatus httpStatus, String message) {
         this.internalCode = internalCode;
+        this.httpStatus = httpStatus;
         this.message = message;
     }
 }
