@@ -100,6 +100,7 @@ public class TaskRepository {
                 .setParameter("taskId", taskId)
                 .executeUpdate();
 
+        // TODO: move to issue repo, and use in service
         entityManager.createNativeQuery("""
                         UPDATE issue
                         SET is_active = false,
