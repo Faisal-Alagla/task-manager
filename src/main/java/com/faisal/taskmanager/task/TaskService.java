@@ -170,7 +170,7 @@ public class TaskService implements ITaskService {
                 )
 
                 // Task priority IDs
-                .taskStatusIds(
+                .taskPriorityIds(
                         priorities.stream()
                                 .map(TaskPriorityLk::getId)
                                 .collect(Collectors.toSet())
