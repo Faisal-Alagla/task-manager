@@ -99,20 +99,6 @@ public class TaskRepository {
                         """)
                 .setParameter("taskId", taskId)
                 .executeUpdate();
-
-        // TODO: move to issue repo, and use in service
-        entityManager.createNativeQuery("""
-                        UPDATE issue
-                        SET is_active = false,
-                            updated_at = CURRENT_TIMESTAMP
-                        WHERE task_id IN (
-                            SELECT descendant_task_id
-                            FROM task_closure
-                            WHERE ancestor_task_id = :taskId
-                        )
-                        """)
-                .setParameter("taskId", taskId)
-                .executeUpdate();
     }
 
     @Transactional(readOnly = true)

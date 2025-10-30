@@ -40,4 +40,12 @@ public interface IIssueService {
      */
     void deleteIssue(UUID issueId);
 
+    /**
+     * Deactivates all issues linked to a task and its descendants.
+     * Called by TaskService when deleting a task hierarchy.
+     *
+     * @param ancestorTaskId the ID of the ancestor task in the task_closure table
+     */
+    void deactivateIssuesByAncestorTaskId(UUID ancestorTaskId);
+
 }

@@ -79,6 +79,11 @@ public class IssueService implements IIssueService {
         issueRepository.deactivateIssue(issueId);
     }
 
+    @Override
+    public void deactivateIssuesByAncestorTaskId(UUID ancestorTaskId) {
+        issueRepository.deactivateIssuesByAncestorTaskId(ancestorTaskId);
+    }
+
     private boolean issueExists(UUID issueId) {
         return issueRepository.findByIdAndIsActiveTrue(issueId).isPresent();
     }

@@ -17,4 +17,18 @@ public interface IssueRepository extends JpaRepository<Issue, UUID> {
     @Query("UPDATE Issue i SET i.isActive = false WHERE i.id = :issueId")
     void deactivateIssue(UUID issueId);
 
+    @Transactional
+    @Modifying
+    @Query(value = """
+            UPDATE issue
+            SET is_active = false,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE task_id IN (
+                SELECT descendant_task_id
+                FROM task_closure
+                WHERE ancestor_task_id = :ancestorTaskId
+            )
+            """, nativeQuery = true)
+    void deactivateIssuesByAncestorTaskId(UUID ancestorTaskId);
+
 }

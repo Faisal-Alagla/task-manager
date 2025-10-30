@@ -7,6 +7,7 @@ import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection
 import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
 import com.faisal.taskmanager.common.lookups.entities.TaskPriorityLk;
 import com.faisal.taskmanager.common.lookups.entities.TaskStatusLk;
+import com.faisal.taskmanager.issue.IIssueService;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
@@ -28,6 +29,7 @@ public class TaskService implements ITaskService {
 
     private final TaskRepository taskRepository;
     private final LookupService lookupService;
+    private final IIssueService issueService;
 
     // lookup collections
     private TaskStatusLookupCollection statuses;
@@ -96,12 +98,17 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    @Transactional
     public void deleteTask(UUID taskId) {
         if (!taskExists(taskId)) {
             throw new HandledException(ErrorMessage.TASK_NOT_FOUND);
         }
 
+        // Deactivate the task and all its descendants
         taskRepository.deactivateTaskAndDescendants(taskId);
+
+        // Deactivate all issues linked to the task and its descendants
+        issueService.deactivateIssuesByAncestorTaskId(taskId);
     }
 
     public boolean taskExists(UUID taskId) {
