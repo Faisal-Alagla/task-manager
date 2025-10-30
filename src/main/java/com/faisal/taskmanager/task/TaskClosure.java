@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.taskclosure;
+package com.faisal.taskmanager.task;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
