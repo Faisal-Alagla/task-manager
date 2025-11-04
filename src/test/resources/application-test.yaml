@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: task-manager
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  liquibase:
+    contexts: test
+    change-log: classpath:/db/liquibase/master.yaml
+  h2:
+    console:
+      enabled: false
+
+task-manager:
+  env: test
+  openapi:
+    dev-url: http://localhost:8080
+    prod-url: http://localhost:8080

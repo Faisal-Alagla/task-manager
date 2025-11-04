@@ -1,19 +1,23 @@
 #Stage 1
 
-FROM maven:3.9-eclipse-temurin-17 as builder
-
-# spped up JVM
-ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+FROM gradle:8.11.1-jdk17 as builder
 
 WORKDIR /app
 
-COPY pom.xml .
+# Copy Gradle wrapper and build files
+COPY gradle gradle
+COPY gradlew .
+COPY settings.gradle .
+COPY build.gradle .
 
-RUN mvn dependency:go-offline
+# Download dependencies (layer caching)
+RUN gradle dependencies --no-daemon
 
+# Copy source code
 COPY ./src ./src
 
-RUN mvn clean package -DskipTests
+# Build the application
+RUN gradle clean build -x test --no-daemon
 
 #Stage 2
 
@@ -21,6 +25,6 @@ FROM eclipse-temurin:17.0.7_7-jre-jammy
 
 WORKDIR /app
 
-COPY --from=builder /app/target/task-manager-0.0.1-SNAPSHOT.jar /app
+COPY --from=builder /app/build/libs/task-manager-0.0.1-SNAPSHOT.jar /app
 
 ENTRYPOINT ["java", "-jar", "/app/task-manager-0.0.1-SNAPSHOT.jar"]
