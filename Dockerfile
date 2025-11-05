@@ -1,12 +1,10 @@
 #Stage 1
 
-FROM gradle:8.11.1-jdk17 as builder
+FROM gradle:8.11.1-jdk17 AS builder
 
 WORKDIR /app
 
-# Copy Gradle wrapper and build files
-COPY gradle gradle
-COPY gradlew .
+# Copy build files
 COPY settings.gradle .
 COPY build.gradle .
 
