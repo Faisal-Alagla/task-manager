@@ -14,8 +14,8 @@ RUN gradle dependencies --no-daemon
 # Copy source code
 COPY ./src ./src
 
-# Build the application
-RUN gradle clean build -x test --no-daemon
+# Build the application (includes tests)
+RUN gradle clean build --no-daemon
 
 #Stage 2
 
