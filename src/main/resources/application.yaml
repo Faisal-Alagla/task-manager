@@ -7,15 +7,15 @@ spring:
       ddl-auto: validate
     show-sql: false
   datasource:
-    url: ${DB_URL:jdbc:postgresql://db:5432/task-manager}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   liquibase:
-    contexts: ${ENV:prod}
+    contexts: ${ENV}
     change-log: classpath:/db/liquibase/master.yaml
 
 task-manager:
-  env: ${ENV:prod}
+  env: ${ENV}
   openapi:
-    dev-url: ${OPENAPI_DEV_URL:http://localhost:8080}
-    prod-url: ${OPENAPI_PROD_URL:http://localhost:8080}
+    dev-url: ${OPENAPI_DEV_URL}
+    prod-url: ${OPENAPI_PROD_URL}
