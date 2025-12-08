@@ -10,8 +10,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +34,7 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskCreationDto taskCreationDto) {
         TaskResponseDto taskResponseDto = iTaskService.createTask(taskCreationDto);
 
-        return new ResponseEntity<>(taskResponseDto, HttpStatus.CREATED);
+        return ResponseEntity.ok(taskResponseDto);
     }
 
     @Operation(
@@ -47,7 +45,7 @@ public class TaskController {
     public ResponseEntity<TaskResponseDto> getTask(@PathVariable("id") UUID id) {
         TaskResponseDto taskResponseDto = iTaskService.getTask(id);
 
-        return new ResponseEntity<>(taskResponseDto, HttpStatus.OK);
+        return ResponseEntity.ok(taskResponseDto);
     }
 
     @Operation(
@@ -58,7 +56,7 @@ public class TaskController {
     public ResponseEntity<Page<TaskResponseDto>> getAllTasks(Pageable pageable) {
         Page<TaskResponseDto> taskResponseDtos = iTaskService.getAllTasks(pageable);
 
-        return new ResponseEntity<>(taskResponseDtos, HttpStatus.OK);
+        return ResponseEntity.ok(taskResponseDtos);
     }
 
     @Operation(
@@ -72,7 +70,7 @@ public class TaskController {
     ) {
         TaskResponseDto taskResponseDto = iTaskService.updateTask(taskUpdateDto, id);
 
-        return new ResponseEntity<>(taskResponseDto, HttpStatus.OK);
+        return ResponseEntity.ok(taskResponseDto);
     }
 
     @Operation(
@@ -80,10 +78,10 @@ public class TaskController {
             description = "Delete a specific task by task id"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatusCode> deleteTask(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable("id") UUID id) {
         iTaskService.deleteTask(id);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +34,7 @@ public class IssueController {
     public ResponseEntity<IssueResponseDto> createIssue(@Valid @RequestBody IssueCreationDto issueCreationDto) {
         IssueResponseDto issueResponseDto = iIssueService.createIssue(issueCreationDto);
 
-        return new ResponseEntity<>(issueResponseDto, HttpStatus.CREATED);
+        return ResponseEntity.ok(issueResponseDto);
     }
 
 
@@ -48,7 +46,7 @@ public class IssueController {
     public ResponseEntity<IssueResponseDto> getIssue(@PathVariable("id") UUID id) {
         IssueResponseDto issueResponseDto = iIssueService.getIssue(id);
 
-        return new ResponseEntity<>(issueResponseDto, HttpStatus.OK);
+        return ResponseEntity.ok(issueResponseDto);
     }
 
     @Operation(
@@ -62,7 +60,7 @@ public class IssueController {
     ) {
         IssueResponseDto issueResponseDto = iIssueService.updateIssue(issueUpdateDto, id);
 
-        return new ResponseEntity<>(issueResponseDto, HttpStatus.OK);
+        return ResponseEntity.ok(issueResponseDto);
     }
 
     @Operation(
@@ -70,10 +68,10 @@ public class IssueController {
             description = "Delete a specific issue by issue id"
     )
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatusCode> deleteIssue(@PathVariable("id") UUID id) {
+    public ResponseEntity<Void> deleteIssue(@PathVariable("id") UUID id) {
         iIssueService.deleteIssue(id);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.noContent().build();
     }
 
 }
