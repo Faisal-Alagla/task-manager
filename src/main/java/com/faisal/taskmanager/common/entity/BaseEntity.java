@@ -8,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SourceType;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -22,9 +23,9 @@ import java.util.UUID;
 @NoArgsConstructor
 public class BaseEntity {
 
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
     @Column(name = "created_at", updatable = false)
