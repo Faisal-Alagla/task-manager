@@ -1,6 +1,6 @@
 #Stage 1
 
-FROM gradle:8.11.1-jdk17 AS builder
+FROM gradle:8.11.1-jdk21 AS builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN gradle clean build --no-daemon
 
 #Stage 2
 
-FROM eclipse-temurin:17.0.7_7-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 WORKDIR /app
 
