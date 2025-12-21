@@ -1,6 +1,6 @@
 package com.faisal.taskmanager.issue;
 
-import com.faisal.taskmanager.utils.baseclasses.BaseEntity;
+import com.faisal.taskmanager.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

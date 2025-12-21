@@ -2,7 +2,6 @@ package com.faisal.taskmanager.common.lookups;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import com.faisal.taskmanager.utils.Interfaces.BaseLookupInterface;
 
 @Data
 @AllArgsConstructor
@@ -12,10 +11,10 @@ public class LookupResponseDto {
 
     private String name;
 
-    public static LookupResponseDto fromEntity(BaseLookupInterface item) {
+    public static LookupResponseDto fromEntity(BaseLookupEntity lookupEntity) {
         return new LookupResponseDto(
-                item.getId(),
-                item.getName()
+                lookupEntity.getId(),
+                lookupEntity.getName()
         );
     }
 }

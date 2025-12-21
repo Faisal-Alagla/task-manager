@@ -1,13 +1,13 @@
 package com.faisal.taskmanager.common.lookups.domain;
 
+import com.faisal.taskmanager.common.lookups.BaseLookupEntity;
 import com.faisal.taskmanager.common.lookups.LookupResponseDto;
 import com.faisal.taskmanager.common.lookups.specifications.LookupSpecification;
-import com.faisal.taskmanager.utils.Interfaces.BaseLookupInterface;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class BaseLookupCollection<T extends BaseLookupInterface> {
+public abstract class BaseLookupCollection<T extends BaseLookupEntity> {
 
     protected final List<T> items;
 

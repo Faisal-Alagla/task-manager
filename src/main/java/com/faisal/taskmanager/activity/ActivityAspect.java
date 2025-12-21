@@ -1,6 +1,5 @@
 package com.faisal.taskmanager.activity;
 
-import com.faisal.taskmanager.utils.Interfaces.BaseResponseDtoInterface;
 import com.faisal.taskmanager.utils.RegexUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,10 +98,19 @@ class ActivityAspect {
     ) {
         if (httpMethod.equals("POST")) {
             ResponseEntity<?> response = (ResponseEntity<?>) obj;
-            BaseResponseDtoInterface body = (BaseResponseDtoInterface) response.getBody();
+            Object body = response.getBody();
 
-            assert body != null;
-            return String.valueOf(body.getId());
+            try {
+                Method getIdMethod = body.getClass().getMethod("getId");
+                Object id = getIdMethod.invoke(body);
+                return id != null ? String.valueOf(id) : null;
+            } catch (NoSuchMethodException e) {
+                log.warn("Response DTO does not have getId() method: {}", body.getClass().getSimpleName());
+                return null;
+            } catch (Exception e) {
+                log.error("Error extracting ID from response body: {}", e.getMessage());
+                return null;
+            }
 
         } else {
             return idList.isEmpty() ? null : idList.get(idList.size() - 1);

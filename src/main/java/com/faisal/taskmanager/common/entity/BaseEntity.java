@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.utils.baseclasses;
+package com.faisal.taskmanager.common.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

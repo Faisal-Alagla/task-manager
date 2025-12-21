@@ -1,6 +1,5 @@
 package com.faisal.taskmanager.task.dto;
 
-import com.faisal.taskmanager.utils.Interfaces.BaseResponseDtoInterface;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.UUID;
         name = "TaskResponse",
         description = "Schema to hold Task information as a response"
 )
-public class TaskResponseDto implements BaseResponseDtoInterface {
+public class TaskResponseDto {
 
     private UUID id;
 

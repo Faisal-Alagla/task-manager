@@ -1,6 +1,6 @@
 package com.faisal.taskmanager.common.lookups.specifications;
 
-import com.faisal.taskmanager.utils.Interfaces.BaseLookupInterface;
+import com.faisal.taskmanager.common.lookups.BaseLookupEntity;
 
 import java.util.function.Predicate;
 
@@ -8,7 +8,7 @@ import java.util.function.Predicate;
  * Specification pattern for lookup filtering
  */
 @FunctionalInterface
-public interface LookupSpecification<T extends BaseLookupInterface> {
+public interface LookupSpecification<T extends BaseLookupEntity> {
 
     /**
      * Convert specification to predicate
