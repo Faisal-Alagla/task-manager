@@ -55,12 +55,18 @@ public class ControllerExceptionHandler {
      * Handles business logic exceptions thrown using {@link HandledException}.
      *
      * <p>Example: {@code .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND))}</p>
+     * <p>If a custom description is provided, it will be used; otherwise, the error message serves as the default description.</p>
      */
     @ExceptionHandler(HandledException.class)
     public ResponseEntity<ErrorResponse> handleHandledException(HandledException ex, WebRequest request) {
         log.error("Handled exception in {}: {}", request.getContextPath(), ex.getErrorMessage().getMessage(), ex);
 
-        ErrorResponse errorResponse = createErrorResponse(ex.getErrorMessage());
+        // Use custom description if provided, otherwise use the error message as default description
+        String description = ex.getDescription() != null
+                ? ex.getDescription()
+                : ex.getErrorMessage().getMessage();
+
+        ErrorResponse errorResponse = createErrorResponse(ex.getErrorMessage(), description);
         return new ResponseEntity<>(errorResponse, ex.getErrorMessage().getHttpStatus());
     }
 
