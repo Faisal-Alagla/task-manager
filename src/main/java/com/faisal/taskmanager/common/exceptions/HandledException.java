@@ -2,37 +2,47 @@ package com.faisal.taskmanager.common.exceptions;
 
 import lombok.Getter;
 
+import java.util.List;
+
 /**
  * Custom runtime exception for handling application-specific errors.
  *
- * <p>This exception wraps predefined error messages from the {@link ErrorMessage} enum,
- * providing a consistent way to handle business logic errors throughout the application.</p>
+ * <p>This exception supports both single error and multiple errors scenarios,
+ * providing a flexible way to handle business logic errors throughout the application.</p>
  *
- * <p><b>Usage Example:</b></p>
+ * <p><b>Usage Examples:</b></p>
  * <pre>{@code
- * // Throw when entity not found (uses default message as description)
+ * // Single error - entity not found
  * taskRepository.findById(id)
  *     .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
  *
- * // Throw with custom description
+ * // Single error with custom description
  * throw new HandledException(
  *     ErrorMessage.TASK_NOT_FOUND,
  *     "Task with ID " + taskId + " not found"
  * );
  *
- * // Wrap another exception with custom description
- * try {
- *     externalService.call();
- * } catch (IOException e) {
- *     throw new HandledException(
- *         ErrorMessage.INTERNAL_SERVER_ERROR,
- *         "Failed to connect to external service",
- *         e
- *     );
+ * // Multiple errors - field-level validation
+ * List<ErrorDetail> errors = new ArrayList<>();
+ * if (nameInvalid) {
+ *     errors.add(ErrorDetail.builder()
+ *         .internalCode(2001)
+ *         .message("Task name is required")
+ *         .field("name")
+ *         .build());
  * }
+ * if (dueDateInvalid) {
+ *     errors.add(ErrorDetail.builder()
+ *         .internalCode(2002)
+ *         .message("Due date must be in the future")
+ *         .field("dueDate")
+ *         .build());
+ * }
+ * throw new HandledException(errors);
  * }</pre>
  *
  * @see ErrorMessage
+ * @see ErrorDetail
  * @see ControllerExceptionHandler
  * @author Faisal
  */
@@ -41,6 +51,7 @@ public class HandledException extends RuntimeException {
 
     private final ErrorMessage errorMessage;
     private final String description;
+    private final List<ErrorDetail> errorDetails;
 
     /**
      * Constructs a new HandledException with the specified error message.
@@ -84,5 +95,21 @@ public class HandledException extends RuntimeException {
         super(cause);
         this.errorMessage = errorMessage;
         this.description = description;
+        this.errorDetails = null;
+    }
+
+    /**
+     * Constructs a new HandledException with a list of error details.
+     * Use this constructor for multiple field-level errors.
+     *
+     * @param errorDetails list of error details
+     */
+    public HandledException(List<ErrorDetail> errorDetails) {
+        super(errorDetails != null && !errorDetails.isEmpty()
+            ? errorDetails.get(0).getMessage()
+            : "Multiple errors occurred");
+        this.errorMessage = null;
+        this.description = null;
+        this.errorDetails = errorDetails;
     }
 }

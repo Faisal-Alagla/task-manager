@@ -1,32 +1,51 @@
 package com.faisal.taskmanager.common.exceptions;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * Standardized error response structure for all API errors.
+ * Standardized error response structure for the application.
  *
- * <p>Provides a consistent format for error responses across the application:</p>
+ * <p>Contains a timestamp and a list of {@link ErrorDetail} objects.
+ * This structure allows returning multiple errors in a single response.</p>
+ *
+ * <p><b>Usage Example:</b></p>
  * <pre>{@code
- * {
- *   "timestamp": "2025-10-29T10:30:00.000+00:00",
- *   "internalCode": 5000,
- *   "message": "Task not found",
- *   "description": "Additional context (optional)"
- * }
+ * ErrorResponse response = ErrorResponse.builder()
+ *     .timestamp(new Date())
+ *     .errors(List.of(
+ *         ErrorDetail.builder()
+ *             .internalCode(2000)
+ *             .message("Task not found")
+ *             .description("No task found with ID abc-123")
+ *             .build()
+ *     ))
+ *     .build();
  * }</pre>
  *
- * @see ErrorMessage
+ * @see ErrorDetail
  * @see HandledException
  * @author Faisal
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ErrorResponse {
+
+    /**
+     * Timestamp when the error occurred.
+     */
     private Date timestamp;
-    private Integer internalCode;
-    private String message;
-    private String description;
+
+    /**
+     * List of error details. Can contain one or more errors.
+     */
+    private List<ErrorDetail> errors;
+
 }

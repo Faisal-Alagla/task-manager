@@ -61,8 +61,9 @@ class ControllerExceptionHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode()).isEqualTo(ErrorMessage.TASK_NOT_FOUND.getHttpStatus());
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getInternalCode()).isEqualTo(ErrorMessage.TASK_NOT_FOUND.getInternalCode());
-            assertThat(response.getBody().getMessage()).isEqualTo(ErrorMessage.TASK_NOT_FOUND.getMessage());
+            assertThat(response.getBody().getErrors()).isNotNull().hasSize(1);
+            assertThat(response.getBody().getErrors().getFirst().getInternalCode()).isEqualTo(ErrorMessage.TASK_NOT_FOUND.getInternalCode());
+            assertThat(response.getBody().getErrors().getFirst().getMessage()).isEqualTo(ErrorMessage.TASK_NOT_FOUND.getMessage());
         }
 
         @Test
@@ -79,7 +80,8 @@ class ControllerExceptionHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode()).isEqualTo(ErrorMessage.INVALID_STATUS_TRANSITION.getHttpStatus());
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getInternalCode()).isEqualTo(ErrorMessage.INVALID_STATUS_TRANSITION.getInternalCode());
+            assertThat(response.getBody().getErrors()).isNotNull().hasSize(1);
+            assertThat(response.getBody().getErrors().getFirst().getInternalCode()).isEqualTo(ErrorMessage.INVALID_STATUS_TRANSITION.getInternalCode());
         }
     }
 
@@ -107,8 +109,11 @@ class ControllerExceptionHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getDescription()).contains("name");
-            assertThat(response.getBody().getDescription()).contains("description");
+            assertThat(response.getBody().getErrors()).isNotNull().hasSize(2);
+            assertThat(response.getBody().getErrors().get(0).getField()).isEqualTo("name");
+            assertThat(response.getBody().getErrors().get(0).getDescription()).isEqualTo("Name cannot be blank");
+            assertThat(response.getBody().getErrors().get(1).getField()).isEqualTo("description");
+            assertThat(response.getBody().getErrors().get(1).getDescription()).isEqualTo("Description is too long");
         }
     }
 
@@ -139,7 +144,8 @@ class ControllerExceptionHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getDescription()).isEqualTo("Invalid task ID");
+            assertThat(response.getBody().getErrors()).isNotNull().hasSize(1);
+            assertThat(response.getBody().getErrors().getFirst().getDescription()).isEqualTo("Invalid task ID");
         }
     }
 
@@ -162,7 +168,8 @@ class ControllerExceptionHandlerTest {
             assertThat(response).isNotNull();
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(response.getBody()).isNotNull();
-            assertThat(response.getBody().getDescription()).contains("taskId");
+            assertThat(response.getBody().getErrors()).isNotNull().hasSize(1);
+            assertThat(response.getBody().getErrors().getFirst().getDescription()).contains("taskId");
         }
     }
 

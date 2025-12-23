@@ -13,9 +13,11 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Global exception handler for the application.
@@ -32,33 +34,84 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
+    /**
+     * Creates an error response with a single error detail.
+     */
     private ErrorResponse createErrorResponse(ErrorMessage message) {
-        return ErrorResponse
-                .builder()
-                .timestamp(new Date())
+        ErrorDetail errorDetail = ErrorDetail.builder()
                 .internalCode(message.getInternalCode())
                 .message(message.getMessage())
                 .build();
+
+        return ErrorResponse.builder()
+                .timestamp(new Date())
+                .errors(Collections.singletonList(errorDetail))
+                .build();
     }
 
+    /**
+     * Creates an error response with a single error detail and description.
+     */
     private ErrorResponse createErrorResponse(ErrorMessage message, String description) {
-        return ErrorResponse
-                .builder()
-                .timestamp(new Date())
+        ErrorDetail errorDetail = ErrorDetail.builder()
                 .internalCode(message.getInternalCode())
                 .message(message.getMessage())
                 .description(description)
+                .build();
+
+        return ErrorResponse.builder()
+                .timestamp(new Date())
+                .errors(Collections.singletonList(errorDetail))
+                .build();
+    }
+
+    /**
+     * Creates an error response with a single field-level error.
+     */
+    private ErrorResponse createFieldErrorResponse(ErrorMessage message, String field, String description) {
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .internalCode(message.getInternalCode())
+                .message(message.getMessage())
+                .field(field)
+                .description(description)
+                .build();
+
+        return ErrorResponse.builder()
+                .timestamp(new Date())
+                .errors(Collections.singletonList(errorDetail))
+                .build();
+    }
+
+    /**
+     * Creates an error response with multiple error details.
+     */
+    private ErrorResponse createErrorResponse(List<ErrorDetail> errors) {
+        return ErrorResponse.builder()
+                .timestamp(new Date())
+                .errors(errors)
                 .build();
     }
 
     /**
      * Handles business logic exceptions thrown using {@link HandledException}.
      *
-     * <p>Example: {@code .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND))}</p>
-     * <p>If a custom description is provided, it will be used; otherwise, the error message serves as the default description.</p>
+     * <p>Supports both single error and multiple errors scenarios.</p>
+     * <p>Example (single error): {@code .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND))}</p>
+     * <p>Example (multiple errors): {@code throw new HandledException(errorDetailsList)}</p>
      */
     @ExceptionHandler(HandledException.class)
     public ResponseEntity<ErrorResponse> handleHandledException(HandledException ex, WebRequest request) {
+        // Handle multiple errors scenario
+        if (ex.getErrorDetails() != null && !ex.getErrorDetails().isEmpty()) {
+            log.error("Handled exception with multiple errors in {}", request.getContextPath(), ex);
+            ErrorResponse errorResponse = createErrorResponse(ex.getErrorDetails());
+
+            // Determine HTTP status from the first error's internal code
+            HttpStatus status = determineHttpStatus(ex.getErrorDetails().get(0).getInternalCode());
+            return new ResponseEntity<>(errorResponse, status);
+        }
+
+        // Handle single error scenario
         log.error("Handled exception in {}: {}", request.getContextPath(), ex.getErrorMessage().getMessage(), ex);
 
         // Use custom description if provided, otherwise use the error message as default description
@@ -71,9 +124,24 @@ public class ControllerExceptionHandler {
     }
 
     /**
+     * Determines HTTP status based on internal error code ranges.
+     */
+    private HttpStatus determineHttpStatus(Integer internalCode) {
+        if (internalCode >= 1000 && internalCode < 2000) {
+            return HttpStatus.BAD_REQUEST; // Validation errors
+        } else if (internalCode >= 2000 && internalCode < 3000) {
+            return internalCode % 100 == 0 ? HttpStatus.NOT_FOUND : HttpStatus.CONFLICT; // Domain errors
+        } else if (internalCode >= 3000 && internalCode < 4000) {
+            return HttpStatus.NOT_FOUND; // Lookup errors
+        } else {
+            return HttpStatus.INTERNAL_SERVER_ERROR; // System errors
+        }
+    }
+
+    /**
      * Handles bean validation errors from {@code @Valid} or {@code @Validated} annotations.
      *
-     * <p>Triggered when request body validation fails.</p>
+     * <p>Triggered when request body validation fails. Returns field-level errors.</p>
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(
@@ -81,16 +149,18 @@ public class ControllerExceptionHandler {
             WebRequest request) {
         log.error("Validation error in {}", request.getContextPath(), ex);
 
-        String validationErrors = ex.getBindingResult()
+        List<ErrorDetail> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining(", "));
+                .map(error -> ErrorDetail.builder()
+                        .internalCode(ErrorMessage.INVALID_REQUEST_ATTRIBUTES.getInternalCode())
+                        .message(ErrorMessage.INVALID_REQUEST_ATTRIBUTES.getMessage())
+                        .field(error.getField())
+                        .description(error.getDefaultMessage())
+                        .build())
+                .toList();
 
-        ErrorResponse errorResponse = createErrorResponse(
-                ErrorMessage.INVALID_REQUEST_ATTRIBUTES,
-                validationErrors);
-
+        ErrorResponse errorResponse = createErrorResponse(errors);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
@@ -105,12 +175,15 @@ public class ControllerExceptionHandler {
             WebRequest request) {
         log.error("Constraint violation in {}", request.getContextPath(), ex);
 
-        ErrorResponse response = createErrorResponse(ErrorMessage.CONSTRAINT_VIOLATED_ERROR);
+        List<ErrorDetail> errors = ex.getConstraintViolations().stream()
+                .map(violation -> ErrorDetail.builder()
+                        .internalCode(ErrorMessage.CONSTRAINT_VIOLATED_ERROR.getInternalCode())
+                        .message(ErrorMessage.CONSTRAINT_VIOLATED_ERROR.getMessage())
+                        .description(violation.getMessage())
+                        .build())
+                .toList();
 
-        ex.getConstraintViolations().stream()
-                .findFirst()
-                .ifPresent(violation -> response.setDescription(violation.getMessage()));
-
+        ErrorResponse response = createErrorResponse(errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
