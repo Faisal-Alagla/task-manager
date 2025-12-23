@@ -1,5 +1,5 @@
 services:
-  db:
+  task-db:
     image: postgres:17.2
     env_file:
       - .env
@@ -21,7 +21,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      db:
+      task-db:
         condition: service_healthy
 
 volumes:
