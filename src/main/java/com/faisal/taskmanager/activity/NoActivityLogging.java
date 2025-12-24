@@ -1,4 +1,4 @@
-package com.faisal.taskmanager.utils.annotations;
+package com.faisal.taskmanager.activity;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

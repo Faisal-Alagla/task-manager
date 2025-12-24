@@ -29,8 +29,8 @@ class ActivityAspect {
                          execution(@org.springframework.web.bind.annotation.RequestMapping * com.faisal.taskmanager..*.*(..)) ||
                          execution(@(@org.springframework.web.bind.annotation.RequestMapping *) * com.faisal.taskmanager..*.*(..))
                      ) && !(
-                         @annotation(com.faisal.taskmanager.utils.annotations.NoActivityLogging) ||
-                         @target(com.faisal.taskmanager.utils.annotations.NoActivityLogging)
+                         @annotation(com.faisal.taskmanager.activity.NoActivityLogging) ||
+                         @target(com.faisal.taskmanager.activity.NoActivityLogging)
                      )
                     """,
             returning = "obj"

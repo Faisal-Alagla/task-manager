@@ -1,6 +1,6 @@
 package com.faisal.taskmanager.common.lookups;
 
-import com.faisal.taskmanager.utils.annotations.NoActivityLogging;
+import com.faisal.taskmanager.activity.NoActivityLogging;
 import com.faisal.taskmanager.utils.constants.BaseRoutingConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
