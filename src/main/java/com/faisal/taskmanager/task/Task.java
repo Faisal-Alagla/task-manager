@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -27,7 +27,7 @@ public class Task extends BaseEntity {
     private UUID assigneeId;
 
     @Column(name = "due_date")
-    private LocalDateTime dueDate;
+    private Instant dueDate;
 
     @Column(name = "description")
     private String description;

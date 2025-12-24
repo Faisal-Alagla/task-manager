@@ -16,13 +16,13 @@ databaseChangeLog:
               - column:
                   defaultValueComputed: now()
                   name: created_at
-                  type: TIMESTAMP WITHOUT TIME ZONE
+                  type: TIMESTAMP WITH TIME ZONE
               - column:
                   name: created_by
                   type: UUID
               - column:
                   name: updated_at
-                  type: TIMESTAMP WITHOUT TIME ZONE
+                  type: TIMESTAMP WITH TIME ZONE
               - column:
                   name: updated_by
                   type: UUID
@@ -34,7 +34,7 @@ databaseChangeLog:
                   type: UUID
               - column:
                   name: due_date
-                  type: TIMESTAMP WITHOUT TIME ZONE
+                  type: TIMESTAMP WITH TIME ZONE
               - column:
                   name: description
                   type: VARCHAR

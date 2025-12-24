@@ -4,8 +4,7 @@ import com.faisal.taskmanager.task.dto.TaskCreationDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import jakarta.persistence.Tuple;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +40,6 @@ public class TaskMapper {
             return null;
         }
 
-        Timestamp dueDateTimestamp = tuple.get("dueDate", Timestamp.class);
-        LocalDateTime dueDate = dueDateTimestamp != null ? dueDateTimestamp.toLocalDateTime() : null;
-
         UUID[] issuesArray = tuple.get("issuesIds", UUID[].class);
         List<UUID> issuesIds = issuesArray != null ? Arrays.asList(issuesArray) : new ArrayList<>();
 
@@ -54,7 +50,7 @@ public class TaskMapper {
                 tuple.get("id", UUID.class),
                 tuple.get("name", String.class),
                 tuple.get("assigneeId", UUID.class),
-                dueDate,
+                tuple.get("dueDate", Instant.class),
                 tuple.get("description", String.class),
                 tuple.get("statusId", Integer.class),
                 tuple.get("priorityId", Integer.class),

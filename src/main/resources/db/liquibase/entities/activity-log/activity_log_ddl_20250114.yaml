@@ -16,21 +16,20 @@ databaseChangeLog:
               - column:
                   defaultValueComputed: now()
                   name: created_at
-                  type: TIMESTAMP WITHOUT TIME ZONE
-                  constraints:
-                    nullable: false
+                  type: TIMESTAMP WITH TIME ZONE
               - column:
-                  defaultValueComputed: now()
+                  name: created_by
+                  type: UUID
+              - column:
                   name: updated_at
-                  type: TIMESTAMP WITHOUT TIME ZONE
-                  constraints:
-                    nullable: false
+                  type: TIMESTAMP WITH TIME ZONE
               - column:
-                  defaultValueBoolean: true
+                  name: updated_by
+                  type: UUID
+              - column:
+                  defaultValue: 'TRUE'
                   name: is_active
                   type: BOOLEAN
-                  constraints:
-                    nullable: false
               - column:
                   name: http_method
                   type: VARCHAR

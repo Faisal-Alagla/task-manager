@@ -5,7 +5,7 @@ import com.faisal.taskmanager.common.lookups.enums.IssueStatusEnum;
 import com.faisal.taskmanager.common.lookups.enums.TaskPriorityEnum;
 import com.faisal.taskmanager.common.lookups.enums.TaskStatusEnum;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public final class TestConstants {
@@ -89,7 +89,7 @@ public final class TestConstants {
     public static final String ISSUE_DESCRIPTION_UPDATED = "Updated issue description";
 
     // Timestamps
-    public static final LocalDateTime BASE_TIMESTAMP = LocalDateTime.of(2025, 1, 15, 10, 0, 0);
+    public static final Instant BASE_TIMESTAMP = Instant.parse("2025-01-15T10:00:00Z");
 
     // ==================== ACTIVITY LOGGING ====================
 

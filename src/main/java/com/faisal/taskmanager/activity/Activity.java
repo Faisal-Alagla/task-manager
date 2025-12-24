@@ -1,12 +1,10 @@
 package com.faisal.taskmanager.activity;
 
+import com.faisal.taskmanager.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.SourceType;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.SuperBuilder;
 
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -15,26 +13,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-class Activity {
-
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    private UUID id;
-
-    @Column(name = "created_at")
-    @CreationTimestamp(source = SourceType.DB)
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    @UpdateTimestamp(source = SourceType.DB)
-    private Instant updatedAt;
-
-    @Column(name = "is_active")
-    private Boolean isActive;
+class Activity extends BaseEntity {
 
     @Column(name = "http_method")
     private String httpMethod;

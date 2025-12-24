@@ -6,8 +6,7 @@ import jakarta.persistence.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.faisal.taskmanager.testutils.builders.TaskCreationDtoBuilder.aTaskCreationDto;
@@ -73,14 +72,13 @@ class TaskMapperTest {
         // Arrange
         Tuple tuple = mock(Tuple.class);
         UUID taskId = TASK_ID_1;
-        Timestamp dueDateTimestamp = Timestamp.valueOf(BASE_TIMESTAMP);
         UUID[] issueIds = {ISSUE_ID_1, ISSUE_ID_2};
         UUID[] childTaskIds = {TASK_ID_2, TASK_ID_3};
 
         when(tuple.get("id", UUID.class)).thenReturn(taskId);
         when(tuple.get("name", String.class)).thenReturn(TASK_NAME);
         when(tuple.get("assigneeId", UUID.class)).thenReturn(USER_ID_1);
-        when(tuple.get("dueDate", Timestamp.class)).thenReturn(dueDateTimestamp);
+        when(tuple.get("dueDate", Instant.class)).thenReturn(BASE_TIMESTAMP);
         when(tuple.get("description", String.class)).thenReturn(TASK_DESCRIPTION);
         when(tuple.get("statusId", Integer.class)).thenReturn(TASK_STATUS_IN_PROGRESS);
         when(tuple.get("priorityId", Integer.class)).thenReturn(TASK_PRIORITY_MEDIUM);
@@ -123,7 +121,7 @@ class TaskMapperTest {
         when(tuple.get("id", UUID.class)).thenReturn(TASK_ID_1);
         when(tuple.get("name", String.class)).thenReturn(TASK_NAME);
         when(tuple.get("assigneeId", UUID.class)).thenReturn(null);
-        when(tuple.get("dueDate", Timestamp.class)).thenReturn(null);
+        when(tuple.get("dueDate", Instant.class)).thenReturn(null);
         when(tuple.get("description", String.class)).thenReturn(TASK_DESCRIPTION);
         when(tuple.get("statusId", Integer.class)).thenReturn(TASK_STATUS_IN_PROGRESS);
         when(tuple.get("priorityId", Integer.class)).thenReturn(TASK_PRIORITY_MEDIUM);

@@ -2,7 +2,7 @@ package com.faisal.taskmanager.testutils.builders;
 
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.faisal.taskmanager.testutils.constants.TestConstants.*;
@@ -11,7 +11,7 @@ public class TaskUpdateDtoBuilder {
 
     private String name = TASK_NAME_UPDATED;
     private UUID assigneeId = null;
-    private LocalDateTime dueDate = null;
+    private Instant dueDate = null;
     private String description = TASK_DESCRIPTION_UPDATED;
     private Integer statusId = TASK_STATUS_IN_PROGRESS;
     private Integer priorityId = TASK_PRIORITY_HIGH;
@@ -30,7 +30,7 @@ public class TaskUpdateDtoBuilder {
         return this;
     }
 
-    public TaskUpdateDtoBuilder withDueDate(LocalDateTime dueDate) {
+    public TaskUpdateDtoBuilder withDueDate(Instant dueDate) {
         this.dueDate = dueDate;
         return this;
     }

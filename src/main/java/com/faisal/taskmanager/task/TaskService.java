@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -136,7 +136,7 @@ public class TaskService implements ITaskService {
     }
 
     private void updateTaskData(Task task, TaskUpdateDto taskUpdateDto) {
-        task.setUpdatedAt(LocalDateTime.now());
+        task.setUpdatedAt(Instant.now());
         task.setName(taskUpdateDto.getName());
         task.setAssigneeId(taskUpdateDto.getAssigneeId());
         task.setDueDate(taskUpdateDto.getDueDate());

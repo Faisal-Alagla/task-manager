@@ -14,7 +14,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -89,7 +89,7 @@ public class IssueService implements IIssueService {
     }
 
     private void updateIssueData(Issue issue, IssueUpdateDto issueUpdateDto) {
-        issue.setUpdatedAt(LocalDateTime.now());
+        issue.setUpdatedAt(Instant.now());
         issue.setName(issueUpdateDto.getName());
         issue.setDescription(issueUpdateDto.getDescription());
         issue.setStatusId(issueUpdateDto.getStatusId());

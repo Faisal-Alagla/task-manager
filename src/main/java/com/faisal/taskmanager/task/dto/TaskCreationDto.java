@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -30,7 +30,7 @@ public class TaskCreationDto {
 
     private UUID assigneeId;
 
-    private LocalDateTime dueDate;
+    private Instant dueDate;
 
     private String description;
 

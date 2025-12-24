@@ -2,7 +2,7 @@ package com.faisal.taskmanager.testutils.builders;
 
 import com.faisal.taskmanager.task.Task;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import static com.faisal.taskmanager.testutils.constants.TestConstants.*;
@@ -13,7 +13,7 @@ public class TaskTestBuilder {
     private String name = TASK_NAME;
     private String description = TASK_DESCRIPTION;
     private UUID assigneeId = null;
-    private LocalDateTime dueDate = null;
+    private Instant dueDate = null;
     private Integer statusId = TASK_STATUS_IN_PROGRESS;
     private Integer priorityId = TASK_PRIORITY_MEDIUM;
 
@@ -41,7 +41,7 @@ public class TaskTestBuilder {
         return this;
     }
 
-    public TaskTestBuilder withDueDate(LocalDateTime dueDate) {
+    public TaskTestBuilder withDueDate(Instant dueDate) {
         this.dueDate = dueDate;
         return this;
     }

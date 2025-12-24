@@ -11,7 +11,7 @@ import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @MappedSuperclass
@@ -30,13 +30,13 @@ public class BaseEntity {
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp(source = SourceType.DB)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "created_by", updatable = false)
     private UUID createdBy;
 
     @Column(name = "updated_at", insertable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "updated_by", insertable = false)
     private UUID updatedBy;

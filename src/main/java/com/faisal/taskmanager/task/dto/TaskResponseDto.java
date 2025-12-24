@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +22,7 @@ public class TaskResponseDto {
 
     private UUID assigneeId;
 
-    private LocalDateTime dueDate;
+    private Instant dueDate;
 
     private String description;
 
