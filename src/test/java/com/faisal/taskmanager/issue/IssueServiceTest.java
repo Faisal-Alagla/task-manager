@@ -67,6 +67,9 @@ class IssueServiceTest {
         IssueCreationDto dto = anIssueCreationDto()
                 .withTaskId(TASK_ID_1)
                 .build();
+        Issue savedIssue = anIssue().build();
+
+        when(issueRepository.save(any(Issue.class))).thenReturn(savedIssue);
 
         issueService.createIssue(dto);
 

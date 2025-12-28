@@ -76,6 +76,11 @@ class TaskServiceTest {
         TaskCreationDto dto = aTaskCreationDto()
                 .withParentTaskId(PARENT_TASK_ID)
                 .build();
+        Task savedTask = aTask().withId(TASK_ID_1).build();
+        Tuple mockTuple = mock(Tuple.class);
+
+        when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
+        when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
 
         taskService.createTask(dto);
 
