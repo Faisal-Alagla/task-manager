@@ -1,6 +1,5 @@
 package com.faisal.taskmanager.task.dto;
 
-import com.faisal.taskmanager.utils.validations.TaskExistsValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -21,7 +20,6 @@ public class TaskCreationDto {
             example = "dd4a292c-13fc-449b-aa0f-00582f3db380",
             nullable = true
     )
-    @TaskExistsValidation(nullable = true)
     private UUID parentTaskId;
 
     @NotBlank(message = "task name can't be empty")

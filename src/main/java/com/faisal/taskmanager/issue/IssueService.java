@@ -10,6 +10,7 @@ import com.faisal.taskmanager.common.lookups.entities.IssueStatusLk;
 import com.faisal.taskmanager.issue.dto.IssueCreationDto;
 import com.faisal.taskmanager.issue.dto.IssueResponseDto;
 import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
+import com.faisal.taskmanager.task.TaskValidator;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class IssueService implements IIssueService {
 
     private final IssueRepository issueRepository;
     private final LookupService lookupService;
+    private final TaskValidator taskValidator;
 
     // lookup collections
     private IssueCriticalityLookupCollection criticalities;
@@ -42,6 +44,8 @@ public class IssueService implements IIssueService {
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
+        taskValidator.validateTaskExists(issueCreationDto.getTaskId(), "taskId");
+
         validateIssueLookups(issueCreationDto.getCriticalityId(), issueCreationDto.getStatusId());
 
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));

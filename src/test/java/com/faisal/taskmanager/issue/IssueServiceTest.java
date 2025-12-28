@@ -6,6 +6,7 @@ import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.issue.dto.IssueCreationDto;
 import com.faisal.taskmanager.issue.dto.IssueResponseDto;
 import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
+import com.faisal.taskmanager.task.TaskValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,12 @@ import static com.faisal.taskmanager.testutils.fixtures.MockLookupFactory.create
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("IssueService")
@@ -38,6 +44,9 @@ class IssueServiceTest {
     @Mock
     private LookupService lookupService;
 
+    @Mock
+    private TaskValidator taskValidator;
+
     @InjectMocks
     private IssueService issueService;
 
@@ -46,11 +55,42 @@ class IssueServiceTest {
         when(lookupService.getIssueStatusCollection()).thenReturn(createIssueStatusCollection());
         when(lookupService.getIssueCriticalityCollection()).thenReturn(createIssueCriticalityCollection());
 
-        issueService = new IssueService(issueRepository, lookupService);
+        issueService = new IssueService(issueRepository, lookupService, taskValidator);
         ReflectionTestUtils.invokeMethod(issueService, "init");
     }
 
     // ========== createIssue() tests ==========
+
+    @Test
+    @DisplayName("createIssue - should validate task exists")
+    void createIssue_shouldValidateTaskExists() {
+        IssueCreationDto dto = anIssueCreationDto()
+                .withTaskId(TASK_ID_1)
+                .build();
+
+        issueService.createIssue(dto);
+
+        verify(taskValidator).validateTaskExists(TASK_ID_1, "taskId");
+    }
+
+    @Test
+    @DisplayName("createIssue - should validate task before other validations")
+    void createIssue_shouldValidateTaskBeforeOtherValidations() {
+        IssueCreationDto dto = anIssueCreationDto()
+                .withTaskId(NON_EXISTENT_TASK_ID)
+                .withCriticalityId(INVALID_ISSUE_CRITICALITY_ID)
+                .build();
+
+        doThrow(new HandledException(ErrorMessage.TASK_NOT_FOUND))
+                .when(taskValidator).validateTaskExists(NON_EXISTENT_TASK_ID, "taskId");
+
+        assertThatThrownBy(() -> issueService.createIssue(dto))
+                .isInstanceOf(HandledException.class)
+                .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.TASK_NOT_FOUND);
+
+        verify(taskValidator).validateTaskExists(NON_EXISTENT_TASK_ID, "taskId");
+        verify(issueRepository, never()).save(any());
+    }
 
     @Test
     @DisplayName("createIssue - should validate criticality ID")

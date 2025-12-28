@@ -34,7 +34,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TaskService")
@@ -49,6 +53,9 @@ class TaskServiceTest {
     @Mock
     private IIssueService issueService;
 
+    @Mock
+    private TaskValidator taskValidator;
+
     @InjectMocks
     private TaskService taskService;
 
@@ -57,11 +64,42 @@ class TaskServiceTest {
         when(lookupService.getTaskStatusCollection()).thenReturn(createTaskStatusCollection());
         when(lookupService.getTaskPriorityCollection()).thenReturn(createTaskPriorityCollection());
 
-        taskService = new TaskService(taskRepository, lookupService, issueService);
+        taskService = new TaskService(taskRepository, lookupService, issueService, taskValidator);
         ReflectionTestUtils.invokeMethod(taskService, "init");
     }
 
     // ========== createTask() tests ==========
+
+    @Test
+    @DisplayName("createTask - should validate parent task exists when provided")
+    void createTask_shouldValidateParentTaskExistsWhenProvided() {
+        TaskCreationDto dto = aTaskCreationDto()
+                .withParentTaskId(PARENT_TASK_ID)
+                .build();
+
+        taskService.createTask(dto);
+
+        verify(taskValidator).validateParentTaskExists(PARENT_TASK_ID);
+    }
+
+    @Test
+    @DisplayName("createTask - should validate parent task before other validations")
+    void createTask_shouldValidateParentTaskBeforeOtherValidations() {
+        TaskCreationDto dto = aTaskCreationDto()
+                .withParentTaskId(NON_EXISTENT_TASK_ID)
+                .withStatusId(INVALID_TASK_STATUS_ID)
+                .build();
+
+        doThrow(new HandledException(ErrorMessage.TASK_NOT_FOUND))
+                .when(taskValidator).validateParentTaskExists(NON_EXISTENT_TASK_ID);
+
+        assertThatThrownBy(() -> taskService.createTask(dto))
+                .isInstanceOf(HandledException.class)
+                .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.TASK_NOT_FOUND);
+
+        verify(taskValidator).validateParentTaskExists(NON_EXISTENT_TASK_ID);
+        verify(taskRepository, never()).saveWithClosure(any(), any());
+    }
 
     @Test
     @DisplayName("createTask - should validate status ID")

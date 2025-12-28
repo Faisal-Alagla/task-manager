@@ -1,8 +1,8 @@
 package com.faisal.taskmanager.issue.dto;
 
-import com.faisal.taskmanager.utils.validations.TaskExistsValidation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -29,7 +29,7 @@ public class IssueCreationDto {
             description = "The Id of the associated task",
             example = "dd4a292c-13fc-449b-aa0f-00582f3db380"
     )
-    @TaskExistsValidation
+    @NotNull(message = "task ID can't be null")
     private UUID taskId;
 
 }

@@ -30,6 +30,7 @@ public class TaskService implements ITaskService {
     private final TaskRepository taskRepository;
     private final LookupService lookupService;
     private final IIssueService issueService;
+    private final TaskValidator taskValidator;
 
     // lookup collections
     private TaskStatusLookupCollection statuses;
@@ -48,6 +49,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
+        taskValidator.validateParentTaskExists(taskCreationDto.getParentTaskId());
+
         validateTaskLookups(taskCreationDto.getStatusId(), taskCreationDto.getPriorityId());
 
         Task createdTask = taskRepository.saveWithClosure(
