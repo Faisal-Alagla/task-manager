@@ -9,12 +9,13 @@ import org.springframework.http.HttpStatus;
  * <p>Each error contains an internal code, HTTP status, and user-friendly message.
  * Internal codes are organized by category:</p>
  * <ul>
- *   <li>1xxx - General errors</li>
- *   <li>2xxx - Validation errors</li>
- *   <li>3xxx - Data integrity errors</li>
- *   <li>4xxx - Business logic errors</li>
- *   <li>5xxx - Task domain errors</li>
- *   <li>6xxx - Issue domain errors</li>
+ *   <li>1xxx - General errors (common across all services)</li>
+ *   <li>2xxx - Validation errors (common across all services)</li>
+ *   <li>3xxx - Data integrity errors (common across all services)</li>
+ *   <li>4xxx - Business logic errors (common across all services)</li>
+ *   <li>5xxx - Task domain errors (service-specific)</li>
+ *   <li>6xxx - Issue domain errors (service-specific)</li>
+ *   <li>7xxx - Lookup errors (service-specific)</li>
  * </ul>
  *
  * <p><b>Usage Example:</b></p>
@@ -52,13 +53,15 @@ public enum ErrorMessage {
 
     // Task domain errors (5xxx)
     TASK_NOT_FOUND(5000, HttpStatus.NOT_FOUND, "Task not found"),
-    TASK_PRIORITY_NOT_FOUND(5001, HttpStatus.NOT_FOUND, "Task priority not found"),
-    TASK_STATUS_NOT_FOUND(5002, HttpStatus.NOT_FOUND, "Task status not found"),
 
     // Issue domain errors (6xxx)
     ISSUE_NOT_FOUND(6000, HttpStatus.NOT_FOUND, "Issue not found"),
-    ISSUE_CRITICALITY_NOT_FOUND(6001, HttpStatus.NOT_FOUND, "Issue criticality not found"),
-    ISSUE_STATUS_NOT_FOUND(6002, HttpStatus.NOT_FOUND, "Issue status not found");
+
+    // Lookup errors (7xxx)
+    TASK_PRIORITY_NOT_FOUND(7000, HttpStatus.NOT_FOUND, "Task priority not found"),
+    TASK_STATUS_NOT_FOUND(7001, HttpStatus.NOT_FOUND, "Task status not found"),
+    ISSUE_CRITICALITY_NOT_FOUND(7002, HttpStatus.NOT_FOUND, "Issue criticality not found"),
+    ISSUE_STATUS_NOT_FOUND(7003, HttpStatus.NOT_FOUND, "Issue status not found");
 
     private final int internalCode;
     private final HttpStatus httpStatus;
