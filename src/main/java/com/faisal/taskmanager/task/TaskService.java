@@ -2,16 +2,11 @@ package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
-import com.faisal.taskmanager.common.lookups.LookupService;
-import com.faisal.taskmanager.common.lookups.domain.TaskPriorityLookupCollection;
-import com.faisal.taskmanager.common.lookups.domain.TaskStatusLookupCollection;
-import com.faisal.taskmanager.common.lookups.entities.TaskPriorityLk;
-import com.faisal.taskmanager.common.lookups.entities.TaskStatusLk;
 import com.faisal.taskmanager.issue.IIssueService;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
-import jakarta.annotation.PostConstruct;
+import com.faisal.taskmanager.task.validator.TaskValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,34 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService implements ITaskService {
 
     private final TaskRepository taskRepository;
-    private final LookupService lookupService;
     private final IIssueService issueService;
     private final TaskValidator taskValidator;
-
-    // lookup collections
-    private TaskStatusLookupCollection statuses;
-    private TaskPriorityLookupCollection priorities;
-
-    // lookup context
-    private TaskLookupContext taskLookupContext;
-
-    @PostConstruct
-    private void init() {
-        this.statuses = lookupService.getTaskStatusCollection();
-        this.priorities = lookupService.getTaskPriorityCollection();
-
-        this.taskLookupContext = buildLookupContext();
-
-        // Inject context into validator
-        taskValidator.setTaskLookupContext(taskLookupContext);
-    }
+    private final TaskLookupContext taskLookupContext;
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
@@ -148,29 +124,5 @@ public class TaskService implements ITaskService {
         task.setDescription(taskUpdateDto.getDescription());
         task.setStatusId(taskUpdateDto.getStatusId());
         task.setPriorityId(taskUpdateDto.getPriorityId());
-    }
-
-    private TaskLookupContext buildLookupContext() {
-        return TaskLookupContext.builder()
-                // Task status IDs
-                .taskStatusIds(
-                        statuses.stream()
-                                .map(TaskStatusLk::getId)
-                                .collect(Collectors.toSet())
-                )
-                .terminalStatusIds(
-                        statuses.getTerminalStatuses().stream()
-                                .map(TaskStatusLk::getId)
-                                .collect(Collectors.toSet())
-                )
-
-                // Task priority IDs
-                .taskPriorityIds(
-                        priorities.stream()
-                                .map(TaskPriorityLk::getId)
-                                .collect(Collectors.toSet())
-                )
-
-                .build();
     }
 }

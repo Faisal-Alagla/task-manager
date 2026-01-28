@@ -2,6 +2,7 @@ package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
+import com.faisal.taskmanager.task.validator.TaskValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,13 +14,8 @@ import java.util.Optional;
 
 import static com.faisal.taskmanager.testutils.builders.TaskTestBuilder.aTask;
 import static com.faisal.taskmanager.testutils.constants.TestConstants.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TaskValidator")

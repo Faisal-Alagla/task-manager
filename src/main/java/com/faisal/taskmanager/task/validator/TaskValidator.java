@@ -1,9 +1,10 @@
-package com.faisal.taskmanager.task;
+package com.faisal.taskmanager.task.validator;
 
 import com.faisal.taskmanager.common.exceptions.ErrorDetailBuilder;
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
+import com.faisal.taskmanager.task.TaskLookupContext;
+import com.faisal.taskmanager.task.TaskRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -27,9 +28,7 @@ public class TaskValidator {
     private static final String FIELD_PRIORITY_ID = "priorityId";
 
     private final TaskRepository taskRepository;
-
-    @Setter
-    private TaskLookupContext taskLookupContext;
+    private final TaskLookupContext taskLookupContext;
 
     /**
      * Validates all lookups for task creation

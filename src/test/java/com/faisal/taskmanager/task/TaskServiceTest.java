@@ -2,11 +2,11 @@ package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
-import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.issue.IIssueService;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
+import com.faisal.taskmanager.task.validator.TaskValidator;
 import jakarta.persistence.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,17 +19,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.faisal.taskmanager.testutils.builders.TaskCreationDtoBuilder.aTaskCreationDto;
 import static com.faisal.taskmanager.testutils.builders.TaskTestBuilder.aTask;
 import static com.faisal.taskmanager.testutils.builders.TaskUpdateDtoBuilder.aTaskUpdateDto;
 import static com.faisal.taskmanager.testutils.constants.TestConstants.*;
-import static com.faisal.taskmanager.testutils.fixtures.MockLookupFactory.createTaskPriorityCollection;
-import static com.faisal.taskmanager.testutils.fixtures.MockLookupFactory.createTaskStatusCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,24 +46,20 @@ class TaskServiceTest {
     private TaskRepository taskRepository;
 
     @Mock
-    private LookupService lookupService;
-
-    @Mock
     private IIssueService issueService;
 
     @Mock
     private TaskValidator taskValidator;
+
+    @Mock
+    private TaskLookupContext taskLookupContext;
 
     @InjectMocks
     private TaskService taskService;
 
     @BeforeEach
     void setUp() {
-        when(lookupService.getTaskStatusCollection()).thenReturn(createTaskStatusCollection());
-        when(lookupService.getTaskPriorityCollection()).thenReturn(createTaskPriorityCollection());
-
-        taskService = new TaskService(taskRepository, lookupService, issueService, taskValidator);
-        ReflectionTestUtils.invokeMethod(taskService, "init");
+        taskService = new TaskService(taskRepository, issueService, taskValidator, taskLookupContext);
     }
 
     // ========== createTask() tests ==========
@@ -113,6 +107,9 @@ class TaskServiceTest {
                 .withStatusId(INVALID_TASK_STATUS_ID)
                 .build();
 
+        doThrow(new HandledException(ErrorMessage.TASK_STATUS_NOT_FOUND))
+                .when(taskValidator).validateTaskCreationLookups(INVALID_TASK_STATUS_ID, dto.getPriorityId());
+
         assertThatThrownBy(() -> taskService.createTask(dto))
                 .isInstanceOf(HandledException.class)
                 .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.TASK_STATUS_NOT_FOUND);
@@ -124,6 +121,9 @@ class TaskServiceTest {
         TaskCreationDto dto = aTaskCreationDto()
                 .withStatusId(INVALID_TASK_STATUS_ID)
                 .build();
+
+        doThrow(new HandledException(ErrorMessage.TASK_STATUS_NOT_FOUND))
+                .when(taskValidator).validateTaskCreationLookups(INVALID_TASK_STATUS_ID, dto.getPriorityId());
 
         try {
             taskService.createTask(dto);
@@ -141,6 +141,9 @@ class TaskServiceTest {
                 .withPriorityId(INVALID_TASK_PRIORITY_ID)
                 .build();
 
+        doThrow(new HandledException(ErrorMessage.TASK_PRIORITY_NOT_FOUND))
+                .when(taskValidator).validateTaskCreationLookups(dto.getStatusId(), INVALID_TASK_PRIORITY_ID);
+
         assertThatThrownBy(() -> taskService.createTask(dto))
                 .isInstanceOf(HandledException.class)
                 .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.TASK_PRIORITY_NOT_FOUND);
@@ -152,6 +155,9 @@ class TaskServiceTest {
         TaskCreationDto dto = aTaskCreationDto()
                 .withPriorityId(INVALID_TASK_PRIORITY_ID)
                 .build();
+
+        doThrow(new HandledException(ErrorMessage.TASK_PRIORITY_NOT_FOUND))
+                .when(taskValidator).validateTaskCreationLookups(dto.getStatusId(), INVALID_TASK_PRIORITY_ID);
 
         try {
             taskService.createTask(dto);
@@ -367,6 +373,8 @@ class TaskServiceTest {
         TaskUpdateDto dto = aTaskUpdateDto().withStatusId(INVALID_TASK_STATUS_ID).build();
 
         when(taskRepository.findByIdAndIsActiveTrue(TASK_ID_1)).thenReturn(Optional.of(existingTask));
+        doThrow(new HandledException(ErrorMessage.TASK_STATUS_NOT_FOUND))
+                .when(taskValidator).validateTaskUpdateLookups(INVALID_TASK_STATUS_ID, dto.getPriorityId());
 
         assertThatThrownBy(() -> taskService.updateTask(dto, TASK_ID_1))
                 .isInstanceOf(HandledException.class)
@@ -380,6 +388,8 @@ class TaskServiceTest {
         TaskUpdateDto dto = aTaskUpdateDto().withPriorityId(INVALID_TASK_PRIORITY_ID).build();
 
         when(taskRepository.findByIdAndIsActiveTrue(TASK_ID_1)).thenReturn(Optional.of(existingTask));
+        doThrow(new HandledException(ErrorMessage.TASK_PRIORITY_NOT_FOUND))
+                .when(taskValidator).validateTaskUpdateLookups(dto.getStatusId(), INVALID_TASK_PRIORITY_ID);
 
         assertThatThrownBy(() -> taskService.updateTask(dto, TASK_ID_1))
                 .isInstanceOf(HandledException.class)
@@ -398,6 +408,7 @@ class TaskServiceTest {
                 .build();
 
         when(taskRepository.findByIdAndIsActiveTrue(TASK_ID_1)).thenReturn(Optional.of(existingTask));
+        when(taskLookupContext.getTerminalStatusIds()).thenReturn(Set.of(TASK_STATUS_COMPLETED, TASK_STATUS_CANCELLED));
 
         assertThatThrownBy(() -> taskService.updateTask(dto, TASK_ID_1))
                 .isInstanceOf(HandledException.class)
@@ -416,6 +427,7 @@ class TaskServiceTest {
                 .build();
 
         when(taskRepository.findByIdAndIsActiveTrue(TASK_ID_1)).thenReturn(Optional.of(existingTask));
+        when(taskLookupContext.getTerminalStatusIds()).thenReturn(Set.of(TASK_STATUS_COMPLETED, TASK_STATUS_CANCELLED));
 
         try {
             taskService.updateTask(dto, TASK_ID_1);
@@ -439,6 +451,7 @@ class TaskServiceTest {
         Tuple mockTuple = mock(Tuple.class);
 
         when(taskRepository.findByIdAndIsActiveTrue(TASK_ID_1)).thenReturn(Optional.of(existingTask));
+        when(taskLookupContext.getTerminalStatusIds()).thenReturn(Set.of(TASK_STATUS_COMPLETED, TASK_STATUS_CANCELLED));
         when(taskRepository.save(any(Task.class))).thenReturn(existingTask);
         when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
 

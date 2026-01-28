@@ -2,11 +2,11 @@ package com.faisal.taskmanager.issue;
 
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
-import com.faisal.taskmanager.common.lookups.LookupService;
 import com.faisal.taskmanager.issue.dto.IssueCreationDto;
 import com.faisal.taskmanager.issue.dto.IssueResponseDto;
 import com.faisal.taskmanager.issue.dto.IssueUpdateDto;
-import com.faisal.taskmanager.task.TaskValidator;
+import com.faisal.taskmanager.issue.validator.IssueValidator;
+import com.faisal.taskmanager.task.validator.TaskValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -22,17 +21,10 @@ import static com.faisal.taskmanager.testutils.builders.IssueCreationDtoBuilder.
 import static com.faisal.taskmanager.testutils.builders.IssueTestBuilder.anIssue;
 import static com.faisal.taskmanager.testutils.builders.IssueUpdateDtoBuilder.anIssueUpdateDto;
 import static com.faisal.taskmanager.testutils.constants.TestConstants.*;
-import static com.faisal.taskmanager.testutils.fixtures.MockLookupFactory.createIssueCriticalityCollection;
-import static com.faisal.taskmanager.testutils.fixtures.MockLookupFactory.createIssueStatusCollection;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("IssueService")
@@ -42,21 +34,17 @@ class IssueServiceTest {
     private IssueRepository issueRepository;
 
     @Mock
-    private LookupService lookupService;
+    private TaskValidator taskValidator;
 
     @Mock
-    private TaskValidator taskValidator;
+    private IssueValidator issueValidator;
 
     @InjectMocks
     private IssueService issueService;
 
     @BeforeEach
     void setUp() {
-        when(lookupService.getIssueStatusCollection()).thenReturn(createIssueStatusCollection());
-        when(lookupService.getIssueCriticalityCollection()).thenReturn(createIssueCriticalityCollection());
-
-        issueService = new IssueService(issueRepository, lookupService, taskValidator);
-        ReflectionTestUtils.invokeMethod(issueService, "init");
+        issueService = new IssueService(issueRepository, taskValidator, issueValidator);
     }
 
     // ========== createIssue() tests ==========
@@ -102,6 +90,9 @@ class IssueServiceTest {
                 .withCriticalityId(INVALID_ISSUE_CRITICALITY_ID)
                 .build();
 
+        doThrow(new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND))
+                .when(issueValidator).validateIssueCreationLookups(INVALID_ISSUE_CRITICALITY_ID, dto.getStatusId());
+
         assertThatThrownBy(() -> issueService.createIssue(dto))
                 .isInstanceOf(HandledException.class)
                 .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
@@ -113,6 +104,9 @@ class IssueServiceTest {
         IssueCreationDto dto = anIssueCreationDto()
                 .withCriticalityId(INVALID_ISSUE_CRITICALITY_ID)
                 .build();
+
+        doThrow(new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND))
+                .when(issueValidator).validateIssueCreationLookups(INVALID_ISSUE_CRITICALITY_ID, dto.getStatusId());
 
         try {
             issueService.createIssue(dto);
@@ -130,6 +124,9 @@ class IssueServiceTest {
                 .withStatusId(INVALID_ISSUE_STATUS_ID)
                 .build();
 
+        doThrow(new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND))
+                .when(issueValidator).validateIssueCreationLookups(dto.getCriticalityId(), INVALID_ISSUE_STATUS_ID);
+
         assertThatThrownBy(() -> issueService.createIssue(dto))
                 .isInstanceOf(HandledException.class)
                 .hasFieldOrPropertyWithValue("errorMessage", ErrorMessage.ISSUE_STATUS_NOT_FOUND);
@@ -141,6 +138,9 @@ class IssueServiceTest {
         IssueCreationDto dto = anIssueCreationDto()
                 .withStatusId(INVALID_ISSUE_STATUS_ID)
                 .build();
+
+        doThrow(new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND))
+                .when(issueValidator).validateIssueCreationLookups(dto.getCriticalityId(), INVALID_ISSUE_STATUS_ID);
 
         try {
             issueService.createIssue(dto);
@@ -292,6 +292,8 @@ class IssueServiceTest {
                 .build();
 
         when(issueRepository.findByIdAndIsActiveTrue(ISSUE_ID_1)).thenReturn(Optional.of(existingIssue));
+        doThrow(new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND))
+                .when(issueValidator).validateIssueUpdateLookups(INVALID_ISSUE_CRITICALITY_ID, dto.getStatusId());
 
         assertThatThrownBy(() -> issueService.updateIssue(dto, ISSUE_ID_1))
                 .isInstanceOf(HandledException.class)
@@ -307,6 +309,8 @@ class IssueServiceTest {
                 .build();
 
         when(issueRepository.findByIdAndIsActiveTrue(ISSUE_ID_1)).thenReturn(Optional.of(existingIssue));
+        doThrow(new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND))
+                .when(issueValidator).validateIssueUpdateLookups(INVALID_ISSUE_CRITICALITY_ID, dto.getStatusId());
 
         try {
             issueService.updateIssue(dto, ISSUE_ID_1);
@@ -326,6 +330,8 @@ class IssueServiceTest {
                 .build();
 
         when(issueRepository.findByIdAndIsActiveTrue(ISSUE_ID_1)).thenReturn(Optional.of(existingIssue));
+        doThrow(new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND))
+                .when(issueValidator).validateIssueUpdateLookups(dto.getCriticalityId(), INVALID_ISSUE_STATUS_ID);
 
         assertThatThrownBy(() -> issueService.updateIssue(dto, ISSUE_ID_1))
                 .isInstanceOf(HandledException.class)
@@ -341,6 +347,8 @@ class IssueServiceTest {
                 .build();
 
         when(issueRepository.findByIdAndIsActiveTrue(ISSUE_ID_1)).thenReturn(Optional.of(existingIssue));
+        doThrow(new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND))
+                .when(issueValidator).validateIssueUpdateLookups(dto.getCriticalityId(), INVALID_ISSUE_STATUS_ID);
 
         try {
             issueService.updateIssue(dto, ISSUE_ID_1);

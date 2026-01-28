@@ -1,9 +1,9 @@
-package com.faisal.taskmanager.issue;
+package com.faisal.taskmanager.issue.validator;
 
 import com.faisal.taskmanager.common.exceptions.ErrorDetailBuilder;
 import com.faisal.taskmanager.common.exceptions.ErrorMessage;
+import com.faisal.taskmanager.issue.IssueLookupContext;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,8 +22,7 @@ public class IssueValidator {
     private static final String FIELD_CRITICALITY_ID = "criticalityId";
     private static final String FIELD_STATUS_ID = "statusId";
 
-    @Setter
-    private IssueLookupContext issueLookupContext;
+    private final IssueLookupContext issueLookupContext;
 
     /**
      * Validates all lookups for issue creation
