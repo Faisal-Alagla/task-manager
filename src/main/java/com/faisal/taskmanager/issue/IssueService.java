@@ -26,6 +26,7 @@ public class IssueService implements IIssueService {
     private final IssueRepository issueRepository;
     private final LookupService lookupService;
     private final TaskValidator taskValidator;
+    private final IssueValidator issueValidator;
 
     // lookup collections
     private IssueCriticalityLookupCollection criticalities;
@@ -40,13 +41,15 @@ public class IssueService implements IIssueService {
         this.statuses = lookupService.getIssueStatusCollection();
 
         this.issueLookupContext = buildLookupContext();
+
+        // Inject context into validator
+        issueValidator.setIssueLookupContext(issueLookupContext);
     }
 
     @Override
     public IssueResponseDto createIssue(IssueCreationDto issueCreationDto) {
         taskValidator.validateTaskExists(issueCreationDto.getTaskId(), "taskId");
-
-        validateIssueLookups(issueCreationDto.getCriticalityId(), issueCreationDto.getStatusId());
+        issueValidator.validateIssueCreationLookups(issueCreationDto.getCriticalityId(), issueCreationDto.getStatusId());
 
         Issue createdIssue = issueRepository.save(IssueMapper.mapToIssue(issueCreationDto));
 
@@ -66,7 +69,7 @@ public class IssueService implements IIssueService {
         Issue issue = issueRepository.findByIdAndIsActiveTrue(issueId)
                 .orElseThrow(() -> new HandledException(ErrorMessage.ISSUE_NOT_FOUND));
 
-        validateIssueLookups(issueUpdateDto.getCriticalityId(), issueUpdateDto.getStatusId());
+        issueValidator.validateIssueUpdateLookups(issueUpdateDto.getCriticalityId(), issueUpdateDto.getStatusId());
 
         updateIssueData(issue, issueUpdateDto);
         Issue updatedIssue = issueRepository.save(issue);
@@ -98,16 +101,6 @@ public class IssueService implements IIssueService {
         issue.setDescription(issueUpdateDto.getDescription());
         issue.setStatusId(issueUpdateDto.getStatusId());
         issue.setCriticalityId(issueUpdateDto.getCriticalityId());
-    }
-
-    private void validateIssueLookups(Integer criticalityId, Integer statusId) {
-        if (!issueLookupContext.getIssueCriticalityIds().contains(criticalityId)) {
-            throw new HandledException(ErrorMessage.ISSUE_CRITICALITY_NOT_FOUND);
-        }
-
-        if (!issueLookupContext.getIssueStatusIds().contains(statusId)) {
-            throw new HandledException(ErrorMessage.ISSUE_STATUS_NOT_FOUND);
-        }
     }
 
     private IssueLookupContext buildLookupContext() {

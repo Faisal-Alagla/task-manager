@@ -45,13 +45,15 @@ public class TaskService implements ITaskService {
         this.priorities = lookupService.getTaskPriorityCollection();
 
         this.taskLookupContext = buildLookupContext();
+
+        // Inject context into validator
+        taskValidator.setTaskLookupContext(taskLookupContext);
     }
 
     @Override
     public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
         taskValidator.validateParentTaskExists(taskCreationDto.getParentTaskId());
-
-        validateTaskLookups(taskCreationDto.getStatusId(), taskCreationDto.getPriorityId());
+        taskValidator.validateTaskCreationLookups(taskCreationDto.getStatusId(), taskCreationDto.getPriorityId());
 
         Task createdTask = taskRepository.saveWithClosure(
                 TaskMapper.mapToTask(taskCreationDto),
@@ -82,7 +84,7 @@ public class TaskService implements ITaskService {
         Task task = taskRepository.findByIdAndIsActiveTrue(taskId)
                 .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
 
-        validateTaskLookups(taskUpdateDto.getStatusId(), taskUpdateDto.getPriorityId());
+        taskValidator.validateTaskUpdateLookups(taskUpdateDto.getStatusId(), taskUpdateDto.getPriorityId());
 
         Integer oldStatus = task.getStatusId();
         Integer newStatus = taskUpdateDto.getStatusId();
@@ -146,16 +148,6 @@ public class TaskService implements ITaskService {
         task.setDescription(taskUpdateDto.getDescription());
         task.setStatusId(taskUpdateDto.getStatusId());
         task.setPriorityId(taskUpdateDto.getPriorityId());
-    }
-
-    private void validateTaskLookups(Integer statusId, Integer priorityId) {
-        if (!taskLookupContext.getTaskStatusIds().contains(statusId)) {
-            throw new HandledException(ErrorMessage.TASK_STATUS_NOT_FOUND);
-        }
-
-        if (!taskLookupContext.getTaskPriorityIds().contains(priorityId)) {
-            throw new HandledException(ErrorMessage.TASK_PRIORITY_NOT_FOUND);
-        }
     }
 
     private TaskLookupContext buildLookupContext() {
