@@ -19,7 +19,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "${TASK_MANAGER_HOST_PORT:-8081}:8080"
     depends_on:
       task-db:
         condition: service_healthy
