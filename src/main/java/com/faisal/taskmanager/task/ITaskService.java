@@ -1,6 +1,7 @@
 package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskCreateResponseDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import org.springframework.data.domain.Page;
@@ -14,9 +15,9 @@ public interface ITaskService {
      * Creates a new task
      *
      * @param taskCreationDto TaskCreationDto object containing the task data to be created
-     * @return TaskResponseDto containing the created task data
+     * @return TaskCreateResponseDto containing the created task data and an optional warning
      */
-    TaskResponseDto createTask(TaskCreationDto taskCreationDto);
+    TaskCreateResponseDto createTask(TaskCreationDto taskCreationDto);
 
     /**
      * Get a task by id

@@ -4,6 +4,7 @@ import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
 import com.faisal.taskmanager.issue.IIssueService;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskCreateResponseDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import com.faisal.taskmanager.task.validator.TaskValidator;
@@ -25,20 +26,27 @@ public class TaskService implements ITaskService {
     private final IIssueService issueService;
     private final TaskValidator taskValidator;
     private final TaskLookupContext taskLookupContext;
+    private final TaskAssigneeValidationGateway taskAssigneeValidationGateway;
 
     @Override
-    public TaskResponseDto createTask(TaskCreationDto taskCreationDto) {
+    @Transactional
+    public TaskCreateResponseDto createTask(TaskCreationDto taskCreationDto) {
         taskValidator.validateParentTaskExists(taskCreationDto.getParentTaskId());
         taskValidator.validateTaskCreationLookups(taskCreationDto.getStatusId(), taskCreationDto.getPriorityId());
+        TaskAssigneeValidationOutcome assigneeValidationOutcome = taskCreationDto.getAssigneeId() == null
+                ? TaskAssigneeValidationOutcome.resolvedAssignee(null)
+                : taskAssigneeValidationGateway.validateAssignee(taskCreationDto.getAssigneeId());
 
         Task createdTask = taskRepository.saveWithClosure(
-                TaskMapper.mapToTask(taskCreationDto),
+                TaskMapper.mapToTask(taskCreationDto, assigneeValidationOutcome.resolvedAssigneeId()),
                 taskCreationDto.getParentTaskId()
         );
 
-        return taskRepository.findTaskByIdWithRelations(createdTask.getId())
+        TaskResponseDto createdTaskResponse = taskRepository.findTaskByIdWithRelations(createdTask.getId())
                 .map(TaskMapper::mapToTaskResponseFromTuple)
                 .orElseThrow(() -> new HandledException(ErrorMessage.TASK_NOT_FOUND));
+
+        return new TaskCreateResponseDto(createdTaskResponse, assigneeValidationOutcome.warning());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.faisal.taskmanager.task;
 
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskCreateResponseDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import com.faisal.taskmanager.utils.constants.BaseRoutingConstants;
@@ -28,11 +29,11 @@ public class TaskController {
 
     @Operation(
             summary = "Create Task",
-            description = "Create a new task"
+            description = "Create a new task. If the supplied assignee does not exist or cannot be validated, the task is created without an assignee and the response includes a warning."
     )
     @PostMapping()
-    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskCreationDto taskCreationDto) {
-        TaskResponseDto taskResponseDto = iTaskService.createTask(taskCreationDto);
+    public ResponseEntity<TaskCreateResponseDto> createTask(@Valid @RequestBody TaskCreationDto taskCreationDto) {
+        TaskCreateResponseDto taskResponseDto = iTaskService.createTask(taskCreationDto);
 
         return ResponseEntity.ok(taskResponseDto);
     }

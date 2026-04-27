@@ -19,9 +19,13 @@ public class TaskMapper {
      * @return Task object containing the passed TaskCreationDto data
      */
     public static Task mapToTask(TaskCreationDto taskCreationDto) {
+        return mapToTask(taskCreationDto, taskCreationDto.getAssigneeId());
+    }
+
+    public static Task mapToTask(TaskCreationDto taskCreationDto, UUID assigneeId) {
         return Task.builder()
                 .name(taskCreationDto.getName())
-                .assigneeId(taskCreationDto.getAssigneeId())
+                .assigneeId(assigneeId)
                 .dueDate(taskCreationDto.getDueDate())
                 .description(taskCreationDto.getDescription())
                 .statusId(taskCreationDto.getStatusId())

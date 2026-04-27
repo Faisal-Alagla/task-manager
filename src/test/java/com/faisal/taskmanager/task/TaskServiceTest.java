@@ -4,6 +4,7 @@ import com.faisal.taskmanager.common.exceptions.ErrorMessage;
 import com.faisal.taskmanager.common.exceptions.HandledException;
 import com.faisal.taskmanager.issue.IIssueService;
 import com.faisal.taskmanager.task.dto.TaskCreationDto;
+import com.faisal.taskmanager.task.dto.TaskCreateResponseDto;
 import com.faisal.taskmanager.task.dto.TaskResponseDto;
 import com.faisal.taskmanager.task.dto.TaskUpdateDto;
 import com.faisal.taskmanager.task.validator.TaskValidator;
@@ -12,7 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.faisal.taskmanager.testutils.builders.TaskCreationDtoBuilder.aTaskCreationDto;
 import static com.faisal.taskmanager.testutils.builders.TaskTestBuilder.aTask;
@@ -54,12 +56,20 @@ class TaskServiceTest {
     @Mock
     private TaskLookupContext taskLookupContext;
 
-    @InjectMocks
+    @Mock
+    private TaskAssigneeValidationGateway taskAssigneeValidationGateway;
+
     private TaskService taskService;
 
     @BeforeEach
     void setUp() {
-        taskService = new TaskService(taskRepository, issueService, taskValidator, taskLookupContext);
+        taskService = new TaskService(
+                taskRepository,
+                issueService,
+                taskValidator,
+                taskLookupContext,
+                taskAssigneeValidationGateway
+        );
     }
 
     // ========== createTask() tests ==========
@@ -252,9 +262,89 @@ class TaskServiceTest {
         when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
         when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
 
-        TaskResponseDto result = taskService.createTask(dto);
+        TaskCreateResponseDto result = taskService.createTask(dto);
 
         assertThat(result).isNotNull();
+        assertThat(result.getTask()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("createTask - should skip assignee validation when assignee is null")
+    void createTask_shouldSkipAssigneeValidationWhenAssigneeIsNull() {
+        TaskCreationDto dto = aTaskCreationDto().withAssigneeId(null).build();
+        Task savedTask = aTask().withId(TASK_ID_1).build();
+        Tuple mockTuple = mock(Tuple.class);
+
+        when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
+        when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
+
+        TaskCreateResponseDto result = taskService.createTask(dto);
+
+        verify(taskAssigneeValidationGateway, never()).validateAssignee(any());
+        assertThat(result.getWarning()).isNull();
+    }
+
+    @Test
+    @DisplayName("createTask - should preserve assignee when user exists")
+    void createTask_shouldPreserveAssigneeWhenUserExists() {
+        TaskCreationDto dto = aTaskCreationDto().withAssigneeId(USER_ID_1).build();
+        Task savedTask = aTask().withId(TASK_ID_1).withAssigneeId(USER_ID_1).build();
+        Tuple mockTuple = mockTaskTuple(TASK_ID_1, USER_ID_1);
+
+        when(taskAssigneeValidationGateway.validateAssignee(USER_ID_1))
+                .thenReturn(TaskAssigneeValidationOutcome.resolvedAssignee(USER_ID_1));
+        when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
+        when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
+
+        TaskCreateResponseDto result = taskService.createTask(dto);
+        ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
+
+        verify(taskAssigneeValidationGateway).validateAssignee(USER_ID_1);
+        verify(taskRepository).saveWithClosure(taskCaptor.capture(), eq(dto.getParentTaskId()));
+        assertThat(taskCaptor.getValue().getAssigneeId()).isEqualTo(USER_ID_1);
+        assertThat(result.getWarning()).isNull();
+        assertThat(result.getTask().getAssigneeId()).isEqualTo(USER_ID_1);
+    }
+
+    @Test
+    @DisplayName("createTask - should clear assignee and return warning when user is missing")
+    void createTask_shouldClearAssigneeAndReturnWarningWhenUserIsMissing() {
+        TaskCreationDto dto = aTaskCreationDto().withAssigneeId(USER_ID_1).build();
+        Task savedTask = aTask().withId(TASK_ID_1).withAssigneeId(null).build();
+        Tuple mockTuple = mockTaskTuple(TASK_ID_1, null);
+        String warning = "Assignee user was not found. Task created without assignee.";
+
+        when(taskAssigneeValidationGateway.validateAssignee(USER_ID_1))
+                .thenReturn(TaskAssigneeValidationOutcome.withoutAssignee(warning));
+        when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
+        when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
+
+        TaskCreateResponseDto result = taskService.createTask(dto);
+        ArgumentCaptor<Task> taskCaptor = ArgumentCaptor.forClass(Task.class);
+
+        verify(taskRepository).saveWithClosure(taskCaptor.capture(), eq(dto.getParentTaskId()));
+        assertThat(taskCaptor.getValue().getAssigneeId()).isNull();
+        assertThat(result.getWarning()).isEqualTo(warning);
+        assertThat(result.getTask().getAssigneeId()).isNull();
+    }
+
+    @Test
+    @DisplayName("createTask - should clear assignee and return warning when validation is unavailable")
+    void createTask_shouldClearAssigneeAndReturnWarningWhenValidationIsUnavailable() {
+        TaskCreationDto dto = aTaskCreationDto().withAssigneeId(USER_ID_1).build();
+        Task savedTask = aTask().withId(TASK_ID_1).withAssigneeId(null).build();
+        Tuple mockTuple = mockTaskTuple(TASK_ID_1, null);
+        String warning = "Assignee could not be validated. Task created without assignee.";
+
+        when(taskAssigneeValidationGateway.validateAssignee(USER_ID_1))
+                .thenReturn(TaskAssigneeValidationOutcome.withoutAssignee(warning));
+        when(taskRepository.saveWithClosure(any(Task.class), any())).thenReturn(savedTask);
+        when(taskRepository.findTaskByIdWithRelations(TASK_ID_1)).thenReturn(Optional.of(mockTuple));
+
+        TaskCreateResponseDto result = taskService.createTask(dto);
+
+        assertThat(result.getWarning()).isEqualTo(warning);
+        assertThat(result.getTask().getAssigneeId()).isNull();
     }
 
     // ========== getTask() tests ==========
@@ -606,5 +696,20 @@ class TaskServiceTest {
         boolean result = taskService.taskExists(NON_EXISTENT_TASK_ID);
 
         assertThat(result).isFalse();
+    }
+
+    private Tuple mockTaskTuple(UUID taskId, UUID assigneeId) {
+        Tuple mockTuple = mock(Tuple.class);
+        when(mockTuple.get("issuesIds", UUID[].class)).thenReturn(new UUID[0]);
+        when(mockTuple.get("childTaskIds", UUID[].class)).thenReturn(new UUID[0]);
+        when(mockTuple.get("id", UUID.class)).thenReturn(taskId);
+        when(mockTuple.get("name", String.class)).thenReturn(TASK_NAME);
+        when(mockTuple.get("assigneeId", UUID.class)).thenReturn(assigneeId);
+        when(mockTuple.get("dueDate", java.time.Instant.class)).thenReturn(null);
+        when(mockTuple.get("description", String.class)).thenReturn(TASK_DESCRIPTION);
+        when(mockTuple.get("statusId", Integer.class)).thenReturn(TASK_STATUS_IN_PROGRESS);
+        when(mockTuple.get("priorityId", Integer.class)).thenReturn(TASK_PRIORITY_MEDIUM);
+        when(mockTuple.get("parentTaskId", UUID.class)).thenReturn(null);
+        return mockTuple;
     }
 }

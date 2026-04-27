@@ -19,3 +19,23 @@ task-manager:
   openapi:
     dev-url: ${OPENAPI_DEV_URL}
     prod-url: ${OPENAPI_PROD_URL}
+  assignee-validation:
+    timeout-ms: ${MESSAGING_ASSIGNEE_VALIDATION_TIMEOUT_MS:3000}
+
+messaging:
+  enabled: ${MESSAGING_ENABLED:false}
+  exchange: ${MESSAGING_EXCHANGE:domain.events}
+  dead-letter-exchange: ${MESSAGING_DLX:domain.events.dlx}
+  publisher:
+    mandatory: ${MESSAGING_PUBLISH_MANDATORY:true}
+  consumer:
+    concurrency: ${MESSAGING_CONSUMER_CONCURRENCY:2}
+    max-attempts: ${MESSAGING_CONSUMER_MAX_ATTEMPTS:5}
+    prefetch: ${MESSAGING_CONSUMER_PREFETCH:20}
+    requeue-rejected: ${MESSAGING_REQUEUE_REJECTED:false}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:rabbitmq}
+    password: ${RABBITMQ_PASSWORD:rabbitmq}
+    virtual-host: ${RABBITMQ_VHOST:/}
