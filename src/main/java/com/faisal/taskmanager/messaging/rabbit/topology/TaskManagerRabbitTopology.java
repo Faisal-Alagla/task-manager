@@ -23,7 +23,7 @@ public class TaskManagerRabbitTopology {
     public static final String ASSIGNEE_VALIDATION_RESULT_DLQ = ASSIGNEE_VALIDATION_RESULT_QUEUE_BASE + MessagingTopology.DLQ_SUFFIX;
     public static final String ASSIGNEE_VALIDATION_RESULT_DLQ_ROUTING_KEY = ASSIGNEE_VALIDATION_RESULT_DLQ;
 
-private final MessagingTopology messagingTopology;
+    private final MessagingTopology messagingTopology;
 
     @Bean
     Declarables taskManagerRabbitDeclarables() {

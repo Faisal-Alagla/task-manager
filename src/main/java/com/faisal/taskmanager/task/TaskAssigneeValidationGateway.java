@@ -36,6 +36,8 @@ public class TaskAssigneeValidationGateway {
     private final MessagingProperties messagingProperties;
     private final TaskAssigneeValidationProperties taskAssigneeValidationProperties;
     private final MessagingMetadata messagingMetadata;
+    // Per-JVM correlation map: replies must be delivered to the replica that issued the request. Scaling
+    // task-manager to multiple replicas requires per-instance reply queues or a DB-backed correlation table.
     private final ConcurrentMap<String, CompletableFuture<TaskAssigneeValidationResultPayload>> pendingValidations =
             new ConcurrentHashMap<>();
 
